@@ -112,6 +112,11 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .flash{background:var(--sheet);border:1.5px solid var(--line);border-radius:16px;padding:28px 20px;text-align:center;min-height:180px;display:flex;flex-direction:column;justify-content:center;gap:12px}
 .flash .w{font-family:var(--font-h);font-size:2rem;font-weight:800;word-break:break-word}
 .flash .m{font-size:1.1rem}
+.drillq{font-family:var(--font-h);font-weight:800;font-size:2.4rem;line-height:1.3;word-break:break-word}
+.drillq sup{font-size:.56em;vertical-align:super;line-height:0;margin-left:1px}
+.drillq span{display:inline-block;font-family:var(--font-b);font-weight:400;font-size:.95rem;color:var(--muted)}
+.drillq svg{display:block;width:min(260px,88%);height:auto;margin:2px auto 14px;color:var(--ink)}
+.drillq svg text{font-family:var(--font-b);font-size:14px;fill:currentColor}
 .boxes{display:flex;gap:6px;margin:10px 0}
 .boxes div{flex:1;background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:6px;text-align:center}
 .boxes b{display:block;font-family:var(--font-h);font-size:1.2rem}
@@ -401,11 +406,38 @@ const TOPICS={
   ()=>{const a=rint(6,15),b=rint(2,5);return{q:`${a}² − ${a-b}²`,a:a*a-(a-b)*(a-b)}}
  ],
  "Geometri":[
+  ()=>{const g=rint(95,140),x=180-g;
+   const svg=`<svg viewBox="0 0 260 170"><line x1="20" y1="45" x2="240" y2="45" stroke="currentColor" stroke-width="2"/><line x1="20" y1="130" x2="240" y2="130" stroke="currentColor" stroke-width="2"/><line x1="70" y1="18" x2="190" y2="160" stroke="currentColor" stroke-width="2"/><path d="M198,45 l6,-5 M198,45 l6,5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M198,130 l6,-5 M198,130 l6,5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M182,130 A18,18 0 0 1 152,116" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M109,45 A18,18 0 0 0 103,61" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="184" y="120">${g}°</text><text x="112" y="62">x°</text><text x="24" y="40">L₁</text><text x="24" y="150">L₂</text></svg>`;
+   return{q:`${svg}<span>L₁ ∥ L₂</span><br>x = ?`,a:x}},
+  ()=>{const a=rint(40,75),b=rint(40,135-a),c=180-a-b;
+   const svg=`<svg viewBox="0 0 240 155"><polygon points="25,130 215,130 150,30" fill="none" stroke="currentColor" stroke-width="2"/><text x="44" y="122">${a}°</text><text x="178" y="122">${b}°</text><text x="138" y="58">x°</text></svg>`;
+   return{q:`${svg}x = ?`,a:c}},
+  ()=>{const g=rint(35,145),x=180-g,rad=g*Math.PI/180,ex=Math.round(120+95*Math.cos(rad)),ey=Math.round(80-95*Math.sin(rad));
+   const svg=`<svg viewBox="0 0 240 105"><line x1="15" y1="80" x2="225" y2="80" stroke="currentColor" stroke-width="2"/><line x1="120" y1="80" x2="${ex}" y2="${ey}" stroke="currentColor" stroke-width="2"/><text x="132" y="72">${g}°</text><text x="94" y="72">x°</text></svg>`;
+   return{q:`${svg}<span>vinklar på en rät linje</span><br>x = ?`,a:x}},
+  ()=>{const t=pickr([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15],[7,24,25]]);
+   const svg=`<svg viewBox="0 0 200 160"><polygon points="30,130 170,130 30,30" fill="none" stroke="currentColor" stroke-width="2"/><path d="M30,112 h18 v18" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="92" y="150">${t[0]}</text><text x="6" y="85">${t[1]}</text><text x="108" y="74">x</text></svg>`;
+   return{q:`${svg}<span>hypotenusan</span><br>x = ?`,a:t[2]}},
+  ()=>{const g=rint(40,140),x=g;
+   const svg=`<svg viewBox="0 0 240 150"><line x1="25" y1="40" x2="215" y2="112" stroke="currentColor" stroke-width="2"/><line x1="25" y1="112" x2="215" y2="40" stroke="currentColor" stroke-width="2"/><text x="112" y="50">${g}°</text><text x="112" y="116">x°</text></svg>`;
+   return{q:`${svg}<span>vertikalvinklar</span><br>x = ?`,a:x}},
+  ()=>{const g=rint(50,135),x=g;
+   const svg=`<svg viewBox="0 0 260 170"><line x1="20" y1="45" x2="240" y2="45" stroke="currentColor" stroke-width="2"/><line x1="20" y1="130" x2="240" y2="130" stroke="currentColor" stroke-width="2"/><line x1="70" y1="18" x2="190" y2="160" stroke="currentColor" stroke-width="2"/><path d="M198,45 l6,-5 M198,45 l6,5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M198,130 l6,-5 M198,130 l6,5" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="176" y="120">${g}°</text><text x="100" y="38">x°</text><text x="24" y="40">L₁</text><text x="24" y="150">L₂</text></svg>`;
+   return{q:`${svg}<span>likbelägna vinklar (L₁ ∥ L₂)</span><br>x = ?`,a:x}},
+  ()=>{const g=rint(50,135),x=g;
+   const svg=`<svg viewBox="0 0 260 170"><line x1="20" y1="45" x2="240" y2="45" stroke="currentColor" stroke-width="2"/><line x1="20" y1="130" x2="240" y2="130" stroke="currentColor" stroke-width="2"/><line x1="70" y1="18" x2="190" y2="160" stroke="currentColor" stroke-width="2"/><path d="M198,45 l6,-5 M198,45 l6,5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M198,130 l6,-5 M198,130 l6,5" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="74" y="62">${g}°</text><text x="176" y="120">x°</text><text x="24" y="40">L₁</text><text x="24" y="150">L₂</text></svg>`;
+   return{q:`${svg}<span>alternatvinklar (L₁ ∥ L₂)</span><br>x = ?`,a:x}},
+  ()=>{const g=rint(20,70),x=90-g,rad=g*Math.PI/180,mx=Math.round(40+150*Math.cos(rad)),my=Math.round(120-150*Math.sin(rad));
+   const svg=`<svg viewBox="0 0 220 150"><line x1="40" y1="120" x2="205" y2="120" stroke="currentColor" stroke-width="2"/><line x1="40" y1="120" x2="40" y2="15" stroke="currentColor" stroke-width="2"/><line x1="40" y1="120" x2="${mx}" y2="${my}" stroke="currentColor" stroke-width="2"/><path d="M58,120 v-18 h-18" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="72" y="112">${g}°</text><text x="48" y="66">x°</text></svg>`;
+   return{q:`${svg}<span>komplementvinklar</span><br>x = ?`,a:x}},
+  ()=>{const a=rint(90,140),b=rint(90,140),x=360-a-b;
+   const svg=`<svg viewBox="0 0 240 170"><line x1="120" y1="85" x2="120" y2="12" stroke="currentColor" stroke-width="2"/><line x1="120" y1="85" x2="40" y2="150" stroke="currentColor" stroke-width="2"/><line x1="120" y1="85" x2="210" y2="140" stroke="currentColor" stroke-width="2"/><text x="146" y="86">${a}°</text><text x="108" y="142">${b}°</text><text x="72" y="92">x°</text></svg>`;
+   return{q:`${svg}<span>vinklar runt en punkt</span><br>x = ?`,a:x}},
+  ()=>{const apex=2*rint(20,60),base=(180-apex)/2;
+   const svg=`<svg viewBox="0 0 240 155"><polygon points="120,25 40,135 200,135" fill="none" stroke="currentColor" stroke-width="2"/><path d="M76,82 l8,3 M72,88 l8,3" stroke="currentColor" stroke-width="1.5"/><path d="M164,82 l-8,3 M168,88 l-8,3" stroke="currentColor" stroke-width="1.5"/><text x="110" y="54">${apex}°</text><text x="50" y="128">x°</text><text x="182" y="128">x°</text></svg>`;
+   return{q:`${svg}<span>likbent triangel</span><br>x = ?`,a:base}},
   ()=>{const r=pickr([2,3,4,5,6,7,10]);return{q:`Cirkelns area med radien ${r}<br><span class="small muted">svara i π, bara siffran</span>`,a:r*r}},
-  ()=>{const r=pickr([2,3,4,5,6,7,10]);return{q:`Cirkelns omkrets med radien ${r}<br><span class="small muted">svara i π, bara siffran</span>`,a:2*r}},
-  ()=>{const b=rint(3,15),h=rint(2,12);return{q:`Triangelns area, bas ${b} och höjd ${h}`,a:b*h/2}},
-  ()=>{const a=rint(3,12),b=rint(4,15);return{q:`Rektangelns area, sidor ${a} och ${b}`,a:a*b}},
-  ()=>{const t=pickr([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15]]);return{q:`Rätvinklig triangel med kateterna ${t[0]} och ${t[1]}<br><span class="small muted">hypotenusan?</span>`,a:t[2]}}
+  ()=>{const b=rint(3,15),h=rint(2,12);return{q:`Triangelns area, bas ${b} och höjd ${h}`,a:b*h/2}}
  ],
  "Statistik och sannolikhet":[
   ()=>{const len=pickr([4,5]);let arr=Array.from({length:len},()=>rint(1,20));const r=arr.reduce((a,b)=>a+b,0)%len;arr[0]+=(len-r)%len;const sum=arr.reduce((a,b)=>a+b,0);return{q:`Medelvärdet av ${arr.join(", ")}`,a:sum/len}},
@@ -694,7 +726,7 @@ function drillHtml(){
   const sc=drill.res.filter(r=>r.ok).length,wr=drill.res.filter(r=>!r.ok),n=drill.qs.length;
   const again=drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
   return `<div class="flash"><div class="w">${sc}/${n}</div><div>på ${drill.sec} sekunder${drill.topic?` · ${drill.topic}`:""}</div>
-    ${wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.q.replace(/<br>.*$/,"")}: <span class="wrong">${esc(r.g)}</span> → <span class="right">${String(r.a).replace(".",",")}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
+    ${wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.q.replace(/<svg[\s\S]*?<\/svg>/g,"[figur] ").replace(/<br>[\s\S]*$/,"")}: <span class="wrong">${esc(r.g)}</span> → <span class="right">${String(r.a).replace(".",",")}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
     <div class="row" style="justify-content:center">${again}<button class="btn ghost" id="drillQuit" style="flex:0 0 auto">Klar</button></div></div>`;
 }
 function vMaterial(){

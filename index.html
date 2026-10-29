@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HP-plugg 1,60</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HP-plugg">
+<meta name="theme-color" content="#22262E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F6F8; --sheet:#FFFFFF; --ink:#22262E; --muted:#5E6573; --line:#D9DDE4;
+  --verb:#3550C8; --verb-soft:#E3E8FB; --kvant:#1F8A5C; --kvant-soft:#DDF2E8;
+  --pencil:#F2C230; --pencil-ink:#3A2E00; --warn:#B4412F;
+  --font-h:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-b:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#16191F; --sheet:#1F232B; --ink:#E9ECF1; --muted:#9AA2B1; --line:#343A46;
+    --verb:#8EA2FF; --verb-soft:#262E52; --kvant:#5FD3A0; --kvant-soft:#173B2C;
+    --pencil:#F2C230; --pencil-ink:#2A2100; --warn:#FF8A75; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#16191F; --sheet:#1F232B; --ink:#E9ECF1; --muted:#9AA2B1; --line:#343A46;
+  --verb:#8EA2FF; --verb-soft:#262E52; --kvant:#5FD3A0; --kvant-soft:#173B2C;
+  --pencil:#F2C230; --pencil-ink:#2A2100; --warn:#FF8A75; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+main{max-width:760px;margin:0 auto;padding:20px 16px 150px}
+h1,h2,h3{font-family:var(--font-h);line-height:1.15;margin:0}
+h1{font-size:2rem;font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.35rem;font-weight:700;margin:28px 0 10px}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:.4em 0}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--pencil);outline-offset:2px}
+.btn{border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:8px 16px;font-weight:700}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.pencil{background:var(--pencil);color:var(--pencil-ink);border-color:var(--pencil)}
+.btn.ghost{border-color:var(--line)}
+.btn.sm{padding:4px 12px;font-size:.875rem}
+.btn:disabled{opacity:.4;cursor:default}
+input[type=text],input[type=number],input[type=date],select,textarea{background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{min-height:70px;resize:vertical}
+label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row>*{flex:1 1 140px}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
+.wk{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-h);font-weight:700;background:var(--sheet);border:1.5px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.9rem;white-space:nowrap}
+.wk b{background:var(--pencil);color:var(--pencil-ink);border-radius:999px;padding:0 8px}
+.sync{font-size:.8rem;color:var(--muted)}
+
+/* goal strip */
+.goal{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:16px 0}
+.goal>div{background:var(--sheet);padding:12px}
+.goal .n{font-family:var(--font-h);font-size:1.6rem;font-weight:800;line-height:1}
+.goal .l{font-size:.8rem;color:var(--muted);margin-top:4px}
+
+/* schedule blocks */
+.blocks{list-style:none;margin:0;padding:0;border-left:3px solid var(--line);margin-left:6px}
+.blk{position:relative;padding:10px 0 14px 18px}
+.blk::before{content:"";position:absolute;left:-8.5px;top:15px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2.5px solid var(--muted)}
+.blk.done::before{background:var(--ink);border-color:var(--ink)}
+.blk.now::before{background:var(--pencil);border-color:var(--pencil)}
+.blk .t{font-family:var(--font-h);font-weight:700;font-variant-numeric:tabular-nums}
+.blk .d{color:var(--muted);font-size:.9rem}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1.5px solid var(--line);background:var(--sheet);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.875rem}
+.chip.v{border-color:var(--verb);color:var(--verb)}
+.chip.k{border-color:var(--kvant);color:var(--kvant)}
+.chip.v:hover{background:var(--verb-soft)} .chip.k:hover{background:var(--kvant-soft)}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* bubble budget: the answer sheet */
+.sheet{background:var(--sheet);border:1.5px solid var(--line);border-radius:14px;padding:14px 14px 10px}
+.brow{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.brow:last-child{border-bottom:0}
+.bname{font-family:var(--font-h);font-weight:800;font-size:.95rem}
+.bname.v{color:var(--verb)} .bname.k{color:var(--kvant)}
+.bub{display:flex;flex-wrap:wrap;gap:5px}
+.bub i{width:17px;height:17px;border-radius:50%;border:1.5px solid var(--muted);display:block;position:relative;overflow:hidden}
+.bub i.f{background:var(--ink);border-color:var(--ink)}
+.bub i.h::after{content:"";position:absolute;inset:0;width:50%;background:var(--ink)}
+.bub i.x{background:var(--pencil);border-color:var(--pencil)}
+.bval{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.split{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line);margin:10px 0 4px}
+.split span{display:block;height:100%}
+
+/* cards */
+.flash{background:var(--sheet);border:1.5px solid var(--line);border-radius:16px;padding:28px 20px;text-align:center;min-height:180px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.flash .w{font-family:var(--font-h);font-size:2rem;font-weight:800;word-break:break-word}
+.flash .m{font-size:1.1rem}
+.boxes{display:flex;gap:6px;margin:10px 0}
+.boxes div{flex:1;background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:6px;text-align:center}
+.boxes b{display:block;font-family:var(--font-h);font-size:1.2rem}
+
+/* tables & lists */
+.tbl{overflow-x:auto;border:1.5px solid var(--line);border-radius:12px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:var(--font-h);font-weight:700;background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td input{min-width:64px;padding:4px 6px}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.check{appearance:none;width:22px;height:22px;flex:0 0 22px;border:2px solid var(--muted);border-radius:50%;margin:1px 0 0;cursor:pointer;background:var(--sheet)}
+.check:checked{background:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 3px var(--sheet)}
+.period{padding:12px 14px;border-left:4px solid var(--line);margin-bottom:8px;background:var(--sheet);border-radius:0 10px 10px 0}
+.period.cur{border-left-color:var(--pencil);box-shadow:0 0 0 1.5px var(--pencil) inset}
+.period.past{opacity:.55}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--pencil);color:var(--pencil-ink);margin-left:6px}
+.note{border-left:4px solid var(--pencil);padding:8px 12px;background:var(--sheet);border-radius:0 10px 10px 0;margin:12px 0;font-size:.95rem}
+.err-bars div{display:grid;grid-template-columns:130px 1fr 30px;gap:8px;align-items:center;margin:4px 0;font-size:.9rem}
+.err-bars span.bar{height:10px;border-radius:999px;background:var(--ink)}
+.chart{background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;padding:10px}
+.chart svg{width:100%;height:auto;display:block}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:6px 14px;font-weight:700}
+.seg button.on{background:var(--ink);color:var(--paper)}
+
+/* timer + nav */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--sheet);border-top:1.5px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.timer{display:none;align-items:center;gap:10px;padding:10px 16px;background:var(--pencil);color:var(--pencil-ink);max-width:none}
+.timer.on{display:flex}
+.timer .clock{font-family:var(--font-h);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
+.timer .lbl{flex:1;font-weight:700;line-height:1.2}
+.timer .btn{border-color:var(--pencil-ink);color:var(--pencil-ink)}
+.timer .btn.primary{background:var(--pencil-ink);color:var(--pencil)}
+nav{display:flex;max-width:760px;margin:0 auto}
+nav button{flex:1;border:0;background:transparent;padding:10px 2px 12px;font-family:var(--font-h);font-weight:700;font-size:.8rem;color:var(--muted);border-top:3px solid transparent}
+nav button.on{color:var(--ink);border-top-color:var(--pencil)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(140px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:999px;font-weight:700;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.empty{padding:18px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:12px}
+details summary{cursor:pointer;font-family:var(--font-h);font-weight:700;padding:8px 0}
+.mat details{background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;padding:4px 14px;margin-bottom:8px}
+.mat details[open]{padding-bottom:12px}
+.mat ul{padding-left:20px;margin:6px 0}
+.mat li{margin:3px 0}
+.mat a{color:var(--verb);font-weight:700}
+.formula{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;font-variant-numeric:tabular-nums}
+.formula div{padding:5px 0;border-bottom:1px dashed var(--line)}
+.guide{font-size:.9rem;margin-top:6px}
+.guide summary{cursor:pointer;font-weight:700;font-size:.875rem;color:var(--muted);padding:2px 0}
+.guide p{margin:4px 0}
+.drillq{font-family:var(--font-h);font-size:1.6rem;font-weight:800;text-align:center;margin:8px 0 12px}
+.right{color:var(--kvant);font-weight:700}.wrong{color:var(--warn);font-weight:700}
+@media (max-width:480px){.formula{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:480px){h1{font-size:1.65rem}.goal .n{font-size:1.3rem}.err-bars div{grid-template-columns:110px 1fr 26px}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div class="dock">
+  <div class="timer" id="timer">
+    <div class="clock" id="clock">00:00</div>
+    <div class="lbl" id="tlbl"></div>
+    <button class="btn sm" id="tcancel">Avbryt</button>
+    <button class="btn sm primary" id="tstop">Spara</button>
+  </div>
+  <nav id="nav">
+    <button data-tab="idag">Idag</button>
+    <button data-tab="vecka">Vecka</button>
+    <button data-tab="ord">ORD</button>
+    <button data-tab="material">Material</button>
+    <button data-tab="logg">Logg</button>
+    <button data-tab="plan">Plan</button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- data ---------- */
+const SUBJ = {
+  LAS:{l:"LÄS",n:"Svensk läsförståelse",v:1,b:6},
+  ELF:{l:"ELF",n:"Engelsk läsförståelse",v:1,b:5},
+  ORD:{l:"ORD",n:"Ordförståelse",v:1,b:4.5},
+  MEK:{l:"MEK",n:"Meningskomplettering",v:1,b:4},
+  XYZ:{l:"XYZ",n:"Matematisk problemlösning",v:0,b:4},
+  KVA:{l:"KVA",n:"Kvantitativa jämförelser",v:0,b:2.5},
+  NOG:{l:"NOG",n:"Kvantitativa resonemang",v:0,b:2},
+  DTK:{l:"DTK",n:"Diagram, tabeller och kartor",v:0,b:2}
+};
+const ALL = Object.keys(SUBJ), VERB=["LAS","ELF","ORD","MEK"], KV=["XYZ","KVA","NOG","DTK"];
+const ERRT = ["Kunskapslucka","Metodval","Feltolkning","Tidsbrist"];
+const B = (s,e,m,o,d)=>({s,e,m,o,d});
+const SCHED = {
+  A:{
+    work:"Arbete 06:00–14:30",
+    wd:[B("16:00","17:15",75,["LAS","ELF"],"Läsförståelse med frågor"),
+        B("17:30","18:30",60,["ORD","MEK"],"Ord, sammanhang, repetition"),
+        B("18:45","19:45",60,KV,"Matematik eller DTK"),
+        B("19:45","20:15",30,ALL,"Felanalys, repetition och planering")],
+    fri:null,
+    sat:[B("09:00","10:30",90,["LAS","ELF"],"Läsförståelse"),
+         B("10:45","12:00",75,["ORD","MEK"],"ORD-kort och MEK"),
+         B("13:00","14:30",90,["XYZ","KVA"],"XYZ och KVA"),
+         B("14:45","15:45",60,["NOG","DTK"],"NOG och DTK"),
+         B("16:00","17:00",60,ALL,"Felanalys av veckans fel")],
+  },
+  B:{
+    work:"Arbete 14:30–23:00 (fredag 14:30–18:30)",
+    wd:[B("08:00","09:30",90,["LAS","ELF"],"Läsförståelse"),
+        B("09:45","10:45",60,["ORD","MEK"],"ORD eller MEK"),
+        B("11:00","12:15",75,KV,"Matematik, DTK eller felanalys")],
+    fri:[B("08:00","09:30",90,["LAS","ELF"],"Läsförståelse"),
+         B("09:45","10:45",60,["ORD","MEK"],"ORD eller MEK"),
+         B("11:00","12:15",75,KV,"Matematik eller DTK"),
+         B("19:30","20:30",60,ALL,"Felanalys")],
+    sat:[B("09:00","10:30",90,["LAS","ELF"],"Läsförståelse"),
+         B("10:45","12:00",75,["ORD","MEK"],"ORD-kort och MEK"),
+         B("13:00","14:30",90,["XYZ","KVA"],"XYZ och KVA"),
+         B("14:45","15:45",60,["NOG","DTK"],"NOG och DTK")],
+  },
+  sun:[B("09:00","10:30",90,["LAS","ELF"],"Läsförståelse eller provpass"),
+       B("10:45","12:00",75,["ORD","MEK"],"ORD-repetition"),
+       B("13:00","14:15",75,KV,"Matematik"),
+       B("14:30","15:30",60,ALL,"Veckosummering och felanalys")]
+};
+const PERIODS = [
+  ["2026-10-19","2026-11-15","Diagnos, matematiska luckor, läsförståelsevana"],
+  ["2026-11-16","2026-12-13","Systematiska metoder och språkförståelse"],
+  ["2026-12-14","2027-01-10","Hastighet, tidssatta delprov och aktiv repetition"],
+  ["2027-01-11","2027-02-07","Gamla prov, felanalys och återträning"],
+  ["2027-02-08","2027-03-07","Provpass på tid, förbättra svagaste områden"],
+  ["2027-03-08","2027-04-10","Fullskaliga simuleringar, stabilitet, återhämtning"]
+];
+const FIRSTWEEK = [
+  "Gör ett diagnostiskt kvantitativt provpass (55 minuter) och notera delprovsresultat",
+  "Gör ett diagnostiskt verbalt provpass (55 minuter) och notera delprovsresultat",
+  "Klassificera varje fel: kunskapslucka, metodval, feltolkning eller tidsbrist",
+  "Skapa en repetitionslista för matte – bara där fel förekommer",
+  "Träna läsförståelse på B2–C1-nivå med frågor och facitförklaring",
+  "Starta ORD-kort för aktiv repetition",
+  "Summera tid, antal rätt och återkommande fel på söndag"
+];
+const MATH = ["Potensregler","Rötter","Bråk","Procent","Algebra"];
+const LEIT = [0,1,3,7,14,30]; // dagar till nästa repetition per låda 1–5 (index = låda)
+const TABS = ["idag","vecka","ord","material","logg","plan"];
+const EXAM_DATE = "2027-04-10";
+
+/* provformat: [antal uppgifter, rekommenderad tid i minuter] */
+const FORMAT = {ORD:[10,3],LAS:[10,22],MEK:[10,8],ELF:[10,22],XYZ:[12,12],KVA:[10,10],NOG:[6,10],DTK:[12,23]};
+
+/* hur varje pass ska göras, per fas: 0 = bas (okt–dec), 1 = tempo (dec–feb), 2 = prov (feb–april) */
+const GUIDE = {
+  LAS:["Läs en text utan tidspress och svara. Gå sedan igenom facit och hitta raden i texten som bevisar rätt svar.",
+       "Två texter på 11 minuter vardera. Läs frågorna först, sedan texten, och markera där svaren finns.",
+       "Hela LÄS-delen ur ett gammalt prov på 22 minuter. Notera vilken frågetyp du missar."],
+  ELF:["Läs en engelsk text på B2–C1-nivå och svara på frågor. Slå upp högst fem ord – förstå helheten.",
+       "ELF-uppgifter ur gamla prov, cirka två minuter per uppgift inklusive läsning.",
+       "Hela ELF-delen på 22 minuter, direkt efter MEK som på provet."],
+  ORD:["Förhör ORD-korten och lägg till 15–20 nya ord. Gör 10 ORD-uppgifter ur gamla prov utan tid.",
+       "ORD-korten, sedan 20 ORD-uppgifter på 6 minuter. Gissa via ordets delar när du inte kan ordet.",
+       "ORD-korten varje dag, högst 15 minuter. Nya ord tas bara från dina egna fel."],
+  MEK:["10 MEK-uppgifter utan tid. Läs hela texten först och leta signalord som men, därför och trots.",
+       "10 MEK-uppgifter på 8 minuter. Uteslut alternativ via den lättaste luckan först.",
+       "MEK inom hela verbala provpass. Gå igenom dina felmönster efteråt."],
+  XYZ:["Repetera ett område i mattebladet och gör sedan 10–15 XYZ ur gamla prov utan tid.",
+       "12 XYZ-uppgifter på 12 minuter. Pröva svarsalternativen baklänges när det går snabbare.",
+       "XYZ inom hela kvantitativa provpass. Lämna en uppgift efter 90 sekunder och kom tillbaka."],
+  KVA:["10 KVA-uppgifter utan tid. Testa alltid 0, 1, −1, ett bråk och ett stort tal.",
+       "10 KVA-uppgifter på 10 minuter.",
+       "KVA inom hela kvantitativa provpass."],
+  NOG:["6 NOG-uppgifter utan tid. Pröva påstående (1) ensamt, (2) ensamt och sedan båda tillsammans.",
+       "6 NOG-uppgifter på 10 minuter. Räkna inte ut svaret – avgör bara om det går.",
+       "NOG inom hela kvantitativa provpass."],
+  DTK:["6 DTK-uppgifter utan tid. Läs rubrik, enheter och fotnoter innan du läser frågorna.",
+       "12 DTK-uppgifter på 23 minuter.",
+       "DTK inom hela kvantitativa provpass."]
+};
+const FELANALYS = "Öppna Logg och gå igenom dagens fel. Gör om varje uppgift utan facit, skriv en mening om varför du missade och vilken feltyp det var. Nya ord lägger du i ORD-korten.";
+
+/* strategi per delprov */
+const DELPROV = {
+  ORD:{opt:null,s:["Svara direkt: antingen kan du ordet eller inte. Sparad tid går till LÄS och ELF.","Bryt ner ordet i förled, rot och efterled. Latinska och grekiska delar som bene-, mal-, pro- och kon- ger ofta en ledtråd.","Läs alla fem alternativ innan du väljer – det närmaste i betydelse vinner, inte det som låter likt."],
+       f:["Alternativ som hör till samma ämne men betyder något annat.","Ord som låter som uppgiftsordet men inte är synonymer."]},
+  LAS:{opt:null,s:["Skumma rubrik och första stycket, läs frågorna och läs sedan texten med frågorna i huvudet.","Rätt svar ska gå att peka ut i texten. Det som bara låter rimligt räcker inte.","Fråga om huvudtanke? Läs inledning och avslutning extra noga."],
+       f:["Påståenden som är sanna men inte svarar på frågan.","Starka ord som alltid, aldrig och enbart.","Egen förkunskap som texten inte stöder."]},
+  MEK:{opt:null,s:["Läs hela meningen eller stycket innan du tittar på alternativen.","Signalord visar om tanken fortsätter (dessutom, alltså) eller vänder (men, däremot, trots).","Med flera luckor: börja med den lättaste och stryk alternativ som inte passar där."],
+       f:["Ord som passar grammatiskt men inte logiskt.","Alternativ som bara fungerar för en av luckorna."]},
+  ELF:{opt:null,s:["Samma metod som LÄS: frågor först, sedan texten.","Vid luckor i texten: läs meningen före och efter luckan.","Förstå sammanhanget – du behöver inte varje ord."],
+       f:["Alternativ som upprepar ord ur texten men ändrar betydelsen.","Negationer och modala ord som might, rarely och not necessarily."]},
+  XYZ:{opt:null,s:["Förenkla uttrycket innan du räknar.","Pröva svarsalternativen baklänges, särskilt i ekvationer.","Uppskatta och stryk orimliga alternativ.","Lämna uppgiften efter cirka 90 sekunder och kom tillbaka sist."],
+       f:["Procent jämfört med procentenheter.","Teckenfel när du flyttar över termer.","Rätt räknat men svar på fel storhet."]},
+  KVA:{opt:["A – I är större än II","B – II är större än I","C – I är lika med II","D – informationen är otillräcklig"],
+       s:["Förenkla båda kvantiteterna på samma sätt, som en våg.","Testa 0, 1, −1, ett bråk mellan 0 och 1 och ett stort tal.","Ger olika tal olika svar är svaret D."],
+       f:["Att anta att en variabel är ett positivt heltal.","Att välja D för tidigt när en förenkling visar svaret."]},
+  NOG:{opt:["A – i (1) men ej i (2)","B – i (2) men ej i (1)","C – i (1) tillsammans med (2)","D – i (1) och (2), var för sig","E – ej genom de båda påståendena"],
+       s:["Frågan är bara om det går att lösa. Räkna inte ut svaret.","Pröva (1) ensamt, sedan (2) ensamt, och först därefter båda tillsammans.","Skriv upp vad som är känt och vad som söks innan du läser påståendena."],
+       f:["Att använda information från (1) när du prövar (2) ensamt.","Att glömma att D betyder att båda räcker var för sig."]},
+  DTK:{opt:null,s:["Läs rubrik, axlar, enheter och fotnoter först.","Avrunda och uppskatta när alternativen ligger långt isär.","Kontrollera om frågan gäller antal eller andel."],
+       f:["Fel år, kategori eller rad.","Tusental jämfört med procent.","Kartans skala och teckenförklaring."]}
+};
+
+/* mattebladet */
+const MATHSHEET = [
+  ["Potenser",[["a<sup>m</sup> · a<sup>n</sup>","a<sup>m+n</sup>"],["a<sup>m</sup> / a<sup>n</sup>","a<sup>m−n</sup>"],["(a<sup>m</sup>)<sup>n</sup>","a<sup>m·n</sup>"],["(ab)<sup>n</sup>","a<sup>n</sup> · b<sup>n</sup>"],["a<sup>0</sup>","1"],["a<sup>−n</sup>","1 / a<sup>n</sup>"],["a<sup>1/n</sup>","n:te roten ur a"]]],
+  ["Rötter",[["√a · √b","√(ab)"],["√a / √b","√(a/b)"],["√(a²)","|a|"],["√2","≈ 1,41"],["√3","≈ 1,73"]]],
+  ["Bråk och decimaler",[["a/b + c/d","(ad + bc) / bd"],["a/b · c/d","ac / bd"],["(a/b) / (c/d)","ad / bc"],["1/8","0,125"],["3/8","0,375"],["1/6","≈ 0,167"],["1/3","≈ 0,333"],["2/3","≈ 0,667"]]],
+  ["Procent",[["Ökning med p %","multiplicera med 1 + p/100"],["Minskning med p %","multiplicera med 1 − p/100"],["Flera förändringar","multiplicera faktorerna"],["Från 20 % till 25 %","5 procentenheter, 25 procent ökning"],["Andel","del / helhet"]]],
+  ["Algebra",[["(a + b)²","a² + 2ab + b²"],["(a − b)²","a² − 2ab + b²"],["(a + b)(a − b)","a² − b²"],["x² + px + q = 0","x = −p/2 ± √((p/2)² − q)"],["Rät linje","y = kx + m"],["Lutning","k = (y₂ − y₁) / (x₂ − x₁)"]]],
+  ["Geometri",[["Triangelns area","bh / 2"],["Pythagoras","a² + b² = c²"],["Cirkelns area","πr²"],["Cirkelns omkrets","2πr"],["Vinkelsumma triangel","180°"],["Vinkelsumma n-hörning","(n − 2) · 180°"],["Areaskala","(längdskala)²"],["Volymskala","(längdskala)³"],["Cylinderns volym","πr²h"]]],
+  ["Statistik och sannolikhet",[["Medelvärde","summa / antal"],["Median","mittersta värdet i storleksordning"],["Typvärde","vanligaste värdet"],["Sannolikhet","gynnsamma / möjliga"],["Oberoende händelser","multiplicera"],["P(inte A)","1 − P(A)"]]],
+  ["Bra att kunna utantill",[["Sträcka","s = v · t"],["Primtal under 30","2, 3, 5, 7, 11, 13, 17, 19, 23, 29"],["Kvadrater","11² = 121, 12² = 144, 13² = 169, 14² = 196, 15² = 225, 16² = 256"],["Delbart med 3","siffersumman är delbar med 3"]]]
+];
+
+const MORE=`abdikera|avsäga sig tronen eller makten;aberration|avvikelse, villfarelse;abnorm|onormal, avvikande;absorbera|suga upp, ta upp i sig;adekvat|lämplig, tillräcklig;adjungera|tillfälligt knyta till sig, t.ex. en ledamot;affirmativ|bekräftande, jakande;agitera|ivrigt försöka påverka andras åsikter;aktualisera|göra aktuell, väcka till liv;allegori|bildlig framställning med dold innebörd;allokera|fördela, avsätta resurser;alternera|växla;amnesti|allmän straffrihet, benådning;anakronism|något som inte hör hemma i tiden;analog|motsvarande, likartad;anarki|laglöshet, avsaknad av styre;annektera|införliva ett område, ofta med våld;antagonist|motståndare, motspelare;antipati|motvilja;antites|motsats;apati|likgiltighet, håglöshet;applicera|tillämpa; anbringa;approximativ|ungefärlig;arkaisk|ålderdomlig;arrogant|högfärdig, övermodig;artikulera|uttrycka tydligt;askes|avhållsamhet från njutningar;assimilera|införliva, ta upp i sig;associera|förknippa;autentisk|äkta;autonom|självständig, självstyrande;aversion|motvilja;banal|alldaglig, utnött;bedräglig|falsk, vilseledande;befatta sig med|syssla med;begrunda|tänka över;behäftad|belastad med (fel, brist);beivra|ingripa mot, åtala;bemöda sig|anstränga sig;beskaffenhet|egenskap, natur;besinna|tänka efter;bestyr|sysslor, göromål;betingad|beroende av, orsakad av;bevekande|rörande, som väcker medlidande;bister|sträng, dyster;blasé|likgiltig, övermätt på intryck;bryderi|förlägenhet, svårighet;bräcklig|skör, ömtålig;cynisk|kallsinnig, misstror andras goda motiv;decimera|kraftigt minska antalet;deduktion|slutsats från det allmänna till det enskilda;definitiv|slutgiltig;degradera|sänka i rang;dekret|förordning, påbud;delegera|överlåta uppgift eller befogenhet;deskriptiv|beskrivande;destruktiv|förstörande;determinera|bestämma, avgöra;devalvera|sänka värdet, särskilt av valuta;devis|motto, valspråk;dikotomi|uppdelning i två motsatser;dilemma|svårt val mellan två alternativ;diskret|försynt, inte uppseendeväckande;disparat|olikartad, oförenlig;disponera|förfoga över; planera;distinkt|tydlig, klar;diversifiera|göra mångsidig, sprida risker;doktrin|lära, grundsats;drastisk|kraftig, ingripande;dubiös|tvivelaktig;efemär|kortvarig, flyktig;effektuera|verkställa;egalitär|jämlik, som verkar för jämlikhet;eklektisk|som väljer och blandar från olika håll;elaborera|utarbeta i detalj;eliminera|avlägsna, utesluta;eloge|beröm;emanera|härröra, utgå från;emancipation|frigörelse;eminent|framstående, utmärkt;endemisk|som bara förekommer i ett visst område;epilog|efterskrift, avslutning;erodera|nöta bort, gradvis försvaga;eskapism|verklighetsflykt;esoterisk|bara för invigda, svårtillgänglig;evident|uppenbar;excentrisk|egendomlig, originell;exkludera|utesluta;exorbitant|orimligt hög;exploatera|utnyttja;extrapolera|dra slutsatser utanför kända data;extravagant|slösaktig, överdådig;fabulera|fantisera, hitta på;fallenhet|anlag, begåvning;fanatisk|blint hängiven;fatal|ödesdiger;fiktiv|påhittad;finess|förfining, raffinemang;flagrant|uppenbar, iögonfallande (om fel);fluktuera|variera, svänga;fragmentarisk|ofullständig, styckvis;frenetisk|vild, intensiv;frugal|sparsam, enkel;futil|meningslös, gagnlös;förbehåll|reservation, villkor;förbistring|förvirring;förfäkta|hävda, försvara en åsikt;förnimma|uppfatta, märka;förordna|utse; föreskriva;förrätta|utföra, t.ex. en ceremoni;försåtlig|lömsk, förrädisk;förtrytelse|harm, förargelse;förvanska|förvränga;generalisera|dra allmänna slutsatser;genuin|äkta;gestikulera|göra gester;gratifikation|extra ersättning;grotesk|vanskapt, orimligt överdriven;gynnsam|fördelaktig;hedonism|livsåskådning med njutning som mål;hegemoni|dominans, överhöghet;heterogen|olikartad;hierarki|rangordning;homogen|likartad, enhetlig;hybris|övermod;hyckleri|skenhelighet;hypotes|antagande som ska prövas;idealisera|framställa som bättre än det är;idiosynkrasi|egenhet; stark motvilja;illusorisk|skenbar, inbillad;immanent|inneboende;impertinent|oförskämd, näsvis;implementera|genomföra, införa;implikation|följd, underförstådd innebörd;inadekvat|otillräcklig, olämplig;incitament|drivkraft, motivation;indiskret|taktlös, avslöjande;indoktrinera|ensidigt inpränta åsikter;induktion|slutsats från enskilda fall till allmän regel;inert|trög, overksam;infam|nedrig, skändlig;inherent|inneboende;initiera|sätta igång;innovativ|nyskapande;insinuera|antyda något negativt;instabil|ostadig;integrera|införliva, sammanfoga;intensifiera|förstärka;interaktion|samspel;intermittent|med avbrott, periodvis;intolerant|ofördragsam;intuitiv|grundad på känsla snarare än resonemang;invektiv|skällsord, smädelse;irrelevant|ovidkommande;irreversibel|oåterkallelig;jargong|gruppspråk, fackspråk;jovialisk|gemytlig, godmodig;kalkylera|beräkna;kamouflera|dölja;kapitulera|ge upp;karismatisk|med stark utstrålning;kategorisk|bestämd, utan förbehåll;klientel|kundkrets;koalition|samarbete mellan partier;kognitiv|som rör tänkande och kunskap;koherent|sammanhängande;kompatibel|förenlig;komplement|komplettering;koncession|tillstånd; eftergift;konfiskera|beslagta;konform|likformig, anpassad;konkret|påtaglig, gripbar;konnotation|bibetydelse;konsistent|följdriktig, fast;konspiration|sammansvärjning;konstatera|fastställa;konstruktiv|uppbyggande;kontinuerlig|oavbruten;kontraproduktiv|som motverkar sitt syfte;konventionell|vedertagen, traditionell;korrelation|samvariation;korrupt|mutbar;kredibilitet|trovärdighet;kronisk|långvarig;kulmen|höjdpunkt;kumulativ|växande genom att läggas på hög;kuriös|egendomlig;labil|ostadig, ombytlig;legitimera|göra rättmätig; styrka identitet;liknöjd|likgiltig;lojal|trogen;lukrativ|lönsam;magnitud|storlek;manifestera|visa tydligt, uttrycka;markant|tydlig, påfallande;maxim|levnadsregel;melankolisk|svårmodig;mentalitet|tankesätt;metafor|bildligt uttryck;metodisk|planmässig;militant|stridslysten;misantrop|människohatare;moderat|måttlig;modifiera|ändra något;monoton|enformig;motsträvig|ovillig;mystifiera|göra gåtfull;naiv|godtrogen;narrativ|berättelse;nihilism|förnekelse av alla värden;nominell|till namnet, formell;normativ|föreskrivande, värderande;nostalgi|längtan tillbaka;nyans|skiftning, fin skillnad;nyckfull|oberäknelig;objektiv|saklig, opartisk;obligatorisk|tvingande;obskyr|okänd, dunkel;odiös|förhatlig, motbjudande;oligarki|fåmannavälde;omnipotent|allsmäktig;omständlig|krånglig, utförlig;opinion|allmän mening;opportunist|person som anpassar sig efter egen fördel;optimal|bästa möjliga;ordinär|vanlig;ortodox|rättrogen, traditionell;paradigm|grundläggande tankemönster;paradox|skenbar motsägelse;parodi|förlöjligande efterapning;partisk|ensidig, inte neutral;patetisk|ömklig; högtidlig;pedant|överdrivet noggrann person;perifer|i utkanten, mindre viktig;permanent|bestående;perplex|förbluffad;persistent|ihållande;pessimistisk|mörksynt;plagiat|otillåten kopia;polarisera|dra isär i motsatta läger;polemik|skarp debatt;populism|politik som spelar på folkliga stämningar;potential|möjlig förmåga;prejudikat|tidigare avgörande som vägledning;predestinerad|förutbestämd;preferens|förkärlek;premiss|förutsättning för en slutsats;pretentiös|anspråksfull;prioritera|ge företräde;privilegium|förmån, särskild rättighet;proaktiv|förutseende, handlar i förväg;problematisera|belysa svårigheter i;proklamera|tillkännage högtidligt;proportionerlig|rimlig i förhållande till något;prosaisk|vardaglig, fantasilös;protagonist|huvudperson;provisorisk|tillfällig;pseudonym|antaget namn;radikal|genomgripande;rationell|förnuftig;reaktionär|bakåtsträvande;reducera|minska;reflektera|tänka efter; återkasta;regression|tillbakagång;reguljär|regelbunden, ordinarie;relativisera|göra mindre absolut;reminiscens|minnesbild;renommé|rykte;repressiv|förtryckande;resignera|ge upp;restriktiv|återhållsam, begränsande;retorik|talekonst, vältalighet;retroaktiv|tillbakaverkande;revidera|se över och ändra;rudimentär|outvecklad, grundläggande;sanktion|godkännande; straffåtgärd;sarkasm|bitande ironi;sekundär|underordnad;selektiv|utväljande;sensibel|känslig;signifikant|betydande, utmärkande;skeptisk|tvivlande;skrupelfri|samvetslös;sofistikerad|förfinad;spekulativ|ogrundad, osäker;stagnera|stå still i utvecklingen;statisk|orörlig;stereotyp|schablonmässig;stimulera|sporra;strikt|sträng;subjektiv|präglad av egen uppfattning;substantiell|väsentlig;sublim|upphöjd;suggestiv|stämningsskapande, påverkande;summarisk|kortfattad, översiktlig;suverän|överlägsen; oberoende;symptomatisk|betecknande;syntes|sammanfogning till en helhet;tabu|förbjudet att tala om;tendens|riktning, benägenhet;tillkortakommande|brist;transparent|genomskinlig, öppen;trivialisera|förringa;turbulent|orolig, stormig;ultimat|yttersta, slutgiltig;unison|samstämmig;universell|allmängiltig;utilitaristisk|nyttoinriktad;vag|oklar, obestämd;valid|giltig;variabel|föränderlig;vederlägga|motbevisa;verifiera|bekräfta;versatil|mångsidig;vital|livskraftig; livsviktig;volatil|flyktig, ombytlig;vulgär|simpel, rå;välvillig|vänligt inställd;åtrå|begär;överseende|tolerans, mildhet;avog|ovänligt inställd;bannor|skäll, tillrättavisning;bjäfs|krimskrams, grannlåt;bångstyrig|svår att styra;dravel|strunt, nonsens;fjäsk|inställsamhet;frejdig|frimodig, käck;föresats|beslut, avsikt;glåpord|hånfullt ord;grannlaga|ömtålig, delikat;harang|långt tal;hemul|stöd, belägg (ha hemul för);hugskott|plötslig idé;idel|bara, enbart;inbördes|sinsemellan, ömsesidig;klenmodig|modlös;lyte|kroppsfel;maklig|bekväm, långsam;medgörlig|lätt att samarbeta med;mödosam|besvärlig;nesa|vanära;nyck|infall;obstinat|trotsig, envis;ofog|otyg, bus;omsvep|omvägar i tal;oväld|opartiskhet;pjoller|tramsigt prat;prål|överdriven prakt;rabulist|bråkmakare;ringakta|förakta;rådvill|villrådig, osäker;sans|besinning;skymf|förolämpning;slentrian|rutin, invand vana;spefull|hånfull;stoj|oväsen;ståt|prakt;svada|ordflöde;tadla|klandra;tilltag|påhitt, handling;trätgirig|grälsjuk;tvehågsen|tvekande, kluven;uppsåt|avsikt;utfästelse|löfte;vanhävd|vanskötsel;vedergällning|hämnd;vidimera|bestyrka, t.ex. en kopia;vurm|svärmeri, förkärlek;yvig|bred, stor; överdriven;ältande|tjatande upprepning;ämbete|tjänst, befattning;ärekränkning|förtal;överdåd|lyx; dumdristighet`;
+/* ORD-startpaket: egna förklaringar */
+const STARTWORDS = [["anomali","avvikelse från det normala"],["pragmatisk","praktisk, inriktad på det som fungerar"],["ambivalent","kluven, med motstridiga känslor"],["eufemism","förskönande omskrivning"],["konsensus","enighet"],["legitim","rättmätig, godtagbar"],["explicit","uttryckligen sagd"],["implicit","underförstådd"],["prekär","osäker, besvärlig"],["diskrepans","skillnad, bristande överensstämmelse"],["empirisk","grundad på observation och erfarenhet"],["hypotetisk","antagen, tänkt"],["marginell","obetydlig, liten"],["koncis","kortfattad och träffande"],["negligera","försumma, strunta i"],["konsolidera","befästa, stärka"],["försumbar","så liten att den kan bortses från"],["inkonsekvent","inte följdriktig"],["kontroversiell","omstridd"],["latent","dold, slumrande"],["eskalera","trappas upp"],["redundant","överflödig"],["sporadisk","enstaka, oregelbunden"],["stringent","stram, logiskt sträng"],["tentativ","preliminär, försöksvis"],["vederhäftig","pålitlig, saklig"],["obsolet","föråldrad"],["lakonisk","kortfattad, ordknapp"],["förebrå","klandra"],["befogad","berättigad"],["vidlyftig","omfattande, utförlig"],["benägen","villig, böjd för"],["utopisk","orealistiskt idealiserad"],["ackumulera","samla på sig"],["kompensera","väga upp, ersätta"],["divergera","gå isär"],["konvergera","närma sig varandra"],["dekadent","förfallen"],["förfoga över","ha tillgång till, disponera"],["subtil","fin, svår att upptäcka"],["trivial","enkel, alldaglig"],["ostentativ","demonstrativ, iögonfallande"],["plausibel","trovärdig, rimlig"],["intrikat","invecklad"],["arbiträr","godtycklig"],["kongruent","överensstämmande"],["kriterium","bedömningsgrund, kännetecken"],["emfas","eftertryck"],["diffus","oklar, otydlig"],["rigid","stel, oböjlig"],["taktfull","finkänslig"],["idka","utöva, bedriva"],["gängse","vanlig, allmänt använd"],["försmå","ringakta, avvisa"],["ombesörja","sköta om, se till"],["nit","iver, flit"],["ståndaktig","orubblig"],["vankelmodig","obeslutsam"],["saktmodig","lugn, mild"],["kverulant","person som ständigt klagar"],["lättja","lathet"],["pietet","vördnad, hänsyn"],["tvetydig","som kan tolkas på flera sätt"],["ändamålsenlig","lämplig för syftet"],["ofrånkomlig","oundviklig"],["egenmäktig","på eget bevåg, utan tillstånd"],["prerogativ","särskild rättighet"],["ambulerande","kringresande"],["bagatellisera","förringa"],["dogmatisk","fast i sina åsikter"],["empati","inlevelseförmåga"],["frekvent","vanlig, ofta förekommande"],["kontemplativ","eftertänksam"],["notorisk","ökänd, välkänd för något dåligt"],["reciprok","ömsesidig"]].concat(MORE.split(";").map(x=>x.split("|")).filter(x=>x.length===2));
+
+/* gamla prov att träna på, i den ordning de ska användas */
+const OLDEXAMS = [
+  ["2022-03-12","Hela provpass, 11 jan–7 feb"],["2022-05-07","Hela provpass, 11 jan–7 feb"],
+  ["2023-03-25","Hela provpass, 11 jan–7 feb"],["2023-10-22","Hela provpass, 11 jan–7 feb"],
+  ["2024-04-13","På tid, 8 feb–7 mars"],["2025-04-05","På tid, 8 feb–7 mars"],
+  ["2025-10-19","Spara: fullskalig simulering"],["2026-04-18","Spara: fullskalig simulering"],["2026-10-18","Spara: fullskalig simulering"]
+];
+
+function phase(){const t=today();let i=PERIODS.findIndex(([a,b])=>t>=a&&(!b||t<=b));if(i<0)i=t<PERIODS[0][0]?0:5;return Math.min(2,Math.floor(i/2))}
+function guideHtml(b){
+  if(b.o.length===8)return `<details class="guide"><summary>Så gör du passet</summary><p>${FELANALYS}</p></details>`;
+  const p=phase();
+  return `<details class="guide"><summary>Så gör du passet</summary>${b.o.map(k=>`<p><b>${SUBJ[k].l}:</b> ${GUIDE[k][p]}</p>`).join("")}</details>`;
+}
+
+/* ljud när passet är slut */
+let AC=null;
+function ensureAudio(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume()}catch(e){}}
+function beep(){ensureAudio();if(!AC)return;try{[0,.35,.7].forEach((t,i)=>{const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+t;o.type="sine";o.frequency.value=i===2?1046:784;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.3,n+.02);g.gain.exponentialRampToValueAtTime(.0001,n+.3);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+.32)})}catch(e){}}
+
+/* snabbräkning */
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pickr=a=>a[Math.floor(Math.random()*a.length)];
+const GEN=[
+  ()=>{const p=pickr([5,10,15,20,25,30,40,60,75]),n=rint(2,20)*20;return{q:`${p} % av ${n}`,a:p*n/100}},
+  ()=>{const a=rint(2,9),b=rint(-4,6),c=rint(-3,5),f=x=>String(x).replace("-","−");return{q:`2<sup>${f(a)}</sup> · 2<sup>${f(b)}</sup> / 2<sup>${f(c)}</sup> = 2<sup>?</sup>`,a:a+b-c}},
+  ()=>{const k=rint(11,25);return{q:`√${k*k}`,a:k}},
+  ()=>{const d=pickr([3,4,5,6,8]),n=rint(1,d-1),m=d*rint(2,12);return{q:`${n}/${d} av ${m}`,a:n*m/d}},
+  ()=>{const x=rint(-9,12),a=rint(2,9),b=rint(-15,15)||4,c=a*x+b;return{q:`${a}x ${b<0?"−":"+"} ${Math.abs(b)} = ${String(c).replace("-","−")}<br><span class="small muted">x = ?</span>`,a:x}},
+  ()=>{const f=pickr([[1,8],[3,8],[5,8],[1,5],[3,4],[7,20],[2,5],[1,16],[3,25],[9,40]]);return{q:`${f[0]}/${f[1]} i decimalform`,a:f[0]/f[1]}},
+  ()=>{const p=pickr([10,20,25,50]),q=pickr([10,20,25,50]);return{q:`+${p} %, sedan −${q} %<br><span class="small muted">hur många procent av startvärdet?</span>`,a:Math.round((1+p/100)*(1-q/100)*10000)/100}},
+  ()=>{const a=rint(4,30);return{q:`${a}² − ${a-1}²`,a:2*a-1}},
+  ()=>{const r=pickr([2,3,4,5,6,7,10]);return{q:`Cirkelns area med radien ${r}<br><span class="small muted">svara i π, bara siffran</span>`,a:r*r}}
+];
+const sgn=x=>String(x).replace("-","−");
+const TOPICS={
+ "Potenser":[
+  ()=>{const a=rint(2,9),b=rint(-4,6),c=rint(-3,5);return{q:`2<sup>${sgn(a)}</sup> · 2<sup>${sgn(b)}</sup> / 2<sup>${sgn(c)}</sup> = 2<sup>?</sup><br><span class="small muted">svara med exponenten</span>`,a:a+b-c}},
+  ()=>{const base=pickr([2,3,5,10]),a=rint(2,4),b=rint(2,4);return{q:`(${base}<sup>${a}</sup>)<sup>${b}</sup> = ${base}<sup>?</sup><br><span class="small muted">svara med exponenten</span>`,a:a*b}},
+  ()=>{const base=pickr([2,3,5]),a=rint(4,8),b=rint(1,3);return{q:`${base}<sup>${a}</sup> / ${base}<sup>${b}</sup> = ${base}<sup>?</sup><br><span class="small muted">svara med exponenten</span>`,a:a-b}},
+  ()=>{const base=pickr([2,3,4,5]),e=rint(2,4);return{q:`${base}<sup>${e}</sup><br><span class="small muted">räkna ut värdet</span>`,a:Math.pow(base,e)}},
+  ()=>{const e=rint(2,6);return{q:`10<sup>${e}</sup><br><span class="small muted">räkna ut värdet</span>`,a:Math.pow(10,e)}}
+ ],
+ "Rötter":[
+  ()=>{const k=rint(11,30);return{q:`√${k*k}`,a:k}},
+  ()=>{const p=pickr([[2,8],[3,12],[2,18],[3,27],[5,20],[2,32],[6,24],[5,45],[3,48]]);return{q:`√${p[0]} · √${p[1]}`,a:Math.sqrt(p[0]*p[1])}},
+  ()=>{const k=pickr([2,3,4,5]);return{q:`∛${k*k*k}<br><span class="small muted">kubikroten</span>`,a:k}},
+  ()=>{const n=pickr([1,4,9,16,25]),d=pickr([4,9,16,25]);return{q:`√(${n}/${d})<br><span class="small muted">svara som decimaltal</span>`,a:Math.round(Math.sqrt(n/d)*1000)/1000}},
+  ()=>{const k=rint(5,15);return{q:`(√${k})²`,a:k}}
+ ],
+ "Bråk och decimaler":[
+  ()=>{const d=pickr([3,4,5,6,8]),n=rint(1,d-1),m=d*rint(2,12);return{q:`${n}/${d} av ${m}`,a:n*m/d}},
+  ()=>{const f=pickr([[1,8],[3,8],[5,8],[1,5],[3,4],[7,20],[2,5],[1,16],[3,25],[9,40],[7,8],[1,4]]);return{q:`${f[0]}/${f[1]} som decimaltal`,a:f[0]/f[1]}},
+  ()=>{const a=pickr([[1,2],[1,3],[1,4],[2,3],[3,4],[1,5],[2,5]]),b=pickr([[1,2],[1,4],[1,6],[1,5]]);return{q:`${a[0]}/${a[1]} + ${b[0]}/${b[1]}<br><span class="small muted">svara som decimaltal</span>`,a:Math.round((a[0]/a[1]+b[0]/b[1])*1000)/1000}},
+  ()=>{const a=pickr([[3,4],[5,6],[2,3],[7,8],[4,5]]),b=pickr([[1,2],[1,4],[1,6],[1,3]]);return{q:`${a[0]}/${a[1]} − ${b[0]}/${b[1]}<br><span class="small muted">svara som decimaltal</span>`,a:Math.round((a[0]/a[1]-b[0]/b[1])*1000)/1000}}
+ ],
+ "Procent":[
+  ()=>{const p=pickr([5,10,15,20,25,30,40,60,75]),n=rint(2,20)*20;return{q:`${p} % av ${n}`,a:p*n/100}},
+  ()=>{const p=pickr([10,20,25,50]),q=pickr([10,20,25,50]);return{q:`+${p} %, sedan −${q} %<br><span class="small muted">hur många procent av startvärdet?</span>`,a:Math.round((1+p/100)*(1-q/100)*10000)/100}},
+  ()=>{const whole=pickr([20,25,40,50,80,200]),frac=pickr([5,10,20,25,50]);return{q:`Hur många procent är ${whole*frac/100} av ${whole}?`,a:frac}},
+  ()=>{const start=rint(2,20)*50,p=pickr([10,20,25,50,100]);return{q:`${start} kr ökar med ${p} %<br><span class="small muted">det nya värdet?</span>`,a:start*(1+p/100)}}
+ ],
+ "Algebra":[
+  ()=>{const x=rint(-9,12),a=rint(2,9),b=rint(-15,15)||4,c=a*x+b;return{q:`${a}x ${b<0?"−":"+"} ${Math.abs(b)} = ${sgn(c)}<br><span class="small muted">x = ?</span>`,a:x}},
+  ()=>{const cc=rint(2,6),d=rint(2,9),b=rint(-8,8);const x=cc*d-b;return{q:`(x ${b<0?"−":"+"} ${Math.abs(b)}) / ${cc} = ${d}<br><span class="small muted">x = ?</span>`,a:x}},
+  ()=>{const a=rint(2,6),b=rint(-5,5),x=rint(-4,6);return{q:`Värdet av ${a}x ${b<0?"−":"+"} ${Math.abs(b)} när x = ${sgn(x)}`,a:a*x+b}},
+  ()=>{const a=rint(6,15),b=rint(2,5);return{q:`${a}² − ${a-b}²`,a:a*a-(a-b)*(a-b)}}
+ ],
+ "Geometri":[
+  ()=>{const r=pickr([2,3,4,5,6,7,10]);return{q:`Cirkelns area med radien ${r}<br><span class="small muted">svara i π, bara siffran</span>`,a:r*r}},
+  ()=>{const r=pickr([2,3,4,5,6,7,10]);return{q:`Cirkelns omkrets med radien ${r}<br><span class="small muted">svara i π, bara siffran</span>`,a:2*r}},
+  ()=>{const b=rint(3,15),h=rint(2,12);return{q:`Triangelns area, bas ${b} och höjd ${h}`,a:b*h/2}},
+  ()=>{const a=rint(3,12),b=rint(4,15);return{q:`Rektangelns area, sidor ${a} och ${b}`,a:a*b}},
+  ()=>{const t=pickr([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15]]);return{q:`Rätvinklig triangel med kateterna ${t[0]} och ${t[1]}<br><span class="small muted">hypotenusan?</span>`,a:t[2]}}
+ ],
+ "Statistik och sannolikhet":[
+  ()=>{const len=pickr([4,5]);let arr=Array.from({length:len},()=>rint(1,20));const r=arr.reduce((a,b)=>a+b,0)%len;arr[0]+=(len-r)%len;const sum=arr.reduce((a,b)=>a+b,0);return{q:`Medelvärdet av ${arr.join(", ")}`,a:sum/len}},
+  ()=>{const raw=Array.from({length:5},()=>rint(1,30));const s=[...raw].sort((a,b)=>a-b);return{q:`Medianen av ${raw.join(", ")}`,a:s[2]}},
+  ()=>{const tot=pickr([4,5,8,10,20,25,50]),fav=rint(1,tot-1);return{q:`En skål har ${tot} kulor, ${fav} är röda.<br><span class="small muted">sannolikhet att dra en röd, som decimaltal</span>`,a:Math.round(fav/tot*1000)/1000}},
+  ()=>{const arr=Array.from({length:pickr([5,6])},()=>rint(1,30));return{q:`Variationsbredden (största − minsta) av ${arr.join(", ")}`,a:Math.max(...arr)-Math.min(...arr)}}
+ ],
+ "Bra att kunna utantill":[
+  ()=>{const k=rint(11,25);return{q:`${k}²`,a:k*k}},
+  ()=>{const f=pickr([[1,8,12.5],[3,8,37.5],[1,4,25],[3,4,75],[1,5,20],[2,5,40],[1,2,50],[7,8,87.5],[5,8,62.5],[3,5,60],[4,5,80]]);return{q:`${f[0]}/${f[1]} i procent`,a:f[2]}},
+  ()=>{const e=rint(3,10);return{q:`2<sup>${e}</sup>`,a:Math.pow(2,e)}},
+  ()=>{const k=pickr([2,3,4,5,10]);return{q:`${k}³`,a:k*k*k}}
+ ]
+};
+let drill=null;
+function focusDrill(){const i=document.getElementById("drillIn");if(i)i.focus()}
+
+/* ---------- date helpers ---------- */
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parse=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const today=()=>ymd(new Date());
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7)}
+function monday(d){const x=new Date(d);const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);x.setHours(0,0,0,0);return x}
+const DAYS=["söndag","måndag","tisdag","onsdag","torsdag","fredag","lördag"];
+const MON=["jan","feb","mars","apr","maj","juni","juli","aug","sep","okt","nov","dec"];
+const nice=s=>{const d=parse(s);return d.getDate()+" "+MON[d.getMonth()]};
+const hm=m=>{m=Math.round(m);const h=Math.floor(m/60),r=m%60;return h?(r?h+" h "+r+" min":h+" h"):r+" min"};
+const hdec=m=>(m/60).toFixed(1).replace(".",",");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+
+/* ---------- state ---------- */
+const LSKEY="hp-plugg-v1";
+function defaults(){
+  const res=[];let d=parse("2026-10-25");
+  while(d<=parse("2027-04-25")){res.push({date:ymd(d),kv:"",ve:"",typ:"",act:""});d=addDays(d,14)}
+  return {v:1,updated:0,sessions:[],errors:[],results:res,cards:[],first:{},math:{},
+    settings:{exam:"2027-04-10",override:{},sound:true},timer:null,exams:{},drill:{rounds:0,best:null},pack:false};
+}
+let S=defaults();
+try{const raw=localStorage.getItem(LSKEY);if(raw)S=Object.assign(defaults(),JSON.parse(raw))}catch(e){}
+function fix(){if(!S.settings.exam)S.settings.exam=EXAM_DATE;S.exams=S.exams||{};S.drill=S.drill||{rounds:0,best:null};if(S.settings.sound===undefined)S.settings.sound=true;
+  if(!S.packAuto){const have=new Set(S.cards.map(c=>c.w.toLowerCase()));STARTWORDS.forEach(([w,m])=>{if(!have.has(w.toLowerCase())){S.cards.push({id:uid(),w,m,box:0,due:today()});have.add(w.toLowerCase())}});S.packAuto=true;S.pack=true;return true}
+  return false}
+
+
+let dbRef=null,writing=Promise.resolve(),pushT=null;
+if(fix())save();
+function save(){
+  S.updated=Date.now();
+  try{localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){}
+  clearTimeout(pushT);pushT=setTimeout(push,800);
+}
+function push(){
+  if(!dbRef)return;
+  const body={state:JSON.stringify(S),updated:S.updated};
+  writing=writing.then(()=>dbRef.set(body)).then(()=>setSync("Sparat i ditt konto")).catch(()=>setSync("Sparat på den här enheten"));
+}
+function setSync(t){const el=document.getElementById("sync");if(el)el.textContent=t;syncText=t}
+let syncText="Sparat på den här enheten";
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+(async()=>{
+  try{
+    if(!window.claude||!window.claude.use)return;
+    const db=await window.claude.use("db");if(!db)return;
+    const user=await window.claude.use("user");const id=user?await user.id():null;if(!id)return;
+    dbRef=db.collection("data/users/"+id).doc("plugg");
+    const snap=await dbRef.get();
+    if(snap.exists){
+      const d=snap.data();
+      if(d&&d.state&&(d.updated||0)>(S.updated||0)){
+        S=Object.assign(defaults(),JSON.parse(d.state));if(fix())save();
+        try{localStorage.setItem(LSKEY,JSON.stringify(S))}catch(e){}
+        render();
+      }else if((S.updated||0)>(d.updated||0))push();
+    }else if(S.updated)push();
+    setSync("Sparat i ditt konto");
+  }catch(e){setSync("Sparat på den här enheten")}
+})();
+
+/* ---------- derived ---------- */
+function weekType(d){
+  const key=ymd(monday(d));
+  if(S.settings.override[key])return S.settings.override[key];
+  return isoWeek(d)%2===1?"A":"B";
+}
+function blocksFor(d){
+  const t=weekType(d),dow=d.getDay(),s=SCHED[t];
+  if(dow===0)return SCHED.sun;
+  if(dow===6)return s.sat;
+  if(dow===5&&s.fri)return s.fri;
+  return s.wd;
+}
+function weekMinutes(d){
+  const m0=ymd(monday(d)),m1=ymd(addDays(monday(d),6));const out={};ALL.forEach(k=>out[k]=0);
+  S.sessions.forEach(x=>{if(x.date>=m0&&x.date<=m1)out[x.subj]=(out[x.subj]||0)+x.min});
+  return out;
+}
+function dayMinutes(ds){return S.sessions.filter(x=>x.date===ds).reduce((a,x)=>a+x.min,0)}
+function dueCards(){const t=today();if(S.newDay!==t){S.newDay=t;S.newCount=0}
+  const rev=S.cards.filter(c=>c.box>0&&c.due<=t),left=Math.max(0,(S.settings.perDay||20)-(S.newCount||0));
+  return rev.concat(S.cards.filter(c=>c.box===0).slice(0,left))}
+
+/* ---------- ui state ---------- */
+let tab=(location.hash||"").replace("#","")||"idag";
+if(!TABS.includes(tab))tab="idag";
+let pick={}; // valt ämne per block
+let schedView=null, cardState={q:[],i:0,show:false};
+let showBackup=false;
+
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("show"),1800)}
+
+/* ---------- views ---------- */
+function header(){
+  const d=new Date(),w=isoWeek(d),t=weekType(d);
+  return `<div class="top"><div><p class="muted small">${DAYS[d.getDay()][0].toUpperCase()+DAYS[d.getDay()].slice(1)} ${d.getDate()} ${MON[d.getMonth()]} ${d.getFullYear()}</p>
+  <h1>Mot 1,60</h1></div><div style="text-align:right"><span class="wk">v.${w} <b>${t}</b></span><div class="sync" id="sync">${syncText}</div></div></div>`;
+}
+
+function vIdag(){
+  const d=new Date(),ds=ymd(d),blocks=blocksFor(d),t=weekType(d),wm=weekMinutes(d);
+  const weekTot=Object.values(wm).reduce((a,b)=>a+b,0),dayTot=dayMinutes(ds);
+  const planned=blocks.reduce((a,b)=>a+b.m,0);
+  let exam="–",examL="Sätt provdatum under Plan";
+  if(S.settings.exam){const n=Math.ceil((parse(S.settings.exam)-parse(ds))/864e5);exam=n>=0?n:"–";examL=n>=0?"dagar till provet":"provet har varit"}
+  const nowM=d.getHours()*60+d.getMinutes(),tm=s=>{const[a,b]=s.split(":").map(Number);return a*60+b};
+  const dow=d.getDay(),work=dow===0||dow===6?"Ledig från arbetet":SCHED[t].work;
+  let h=header();
+  h+=`<div class="goal"><div><div class="n">${hm(dayTot)}</div><div class="l">av ${hm(planned)} idag</div></div>
+  <div><div class="n">${hdec(weekTot)}</div><div class="l">av 30 h denna vecka</div></div>
+  <div><div class="n">${exam}</div><div class="l">${examL}</div></div></div>`;
+  const firstOpen=FIRSTWEEK.filter((_,i)=>!S.first[i]).length;
+  if(ds>="2026-12-15"&&ds<="2027-01-14")h+=`<div class="note">Anmälan till provet 10 april 2027 är öppen 7–14 januari på hogskoleprov.nu. Det finns ingen efteranmälan.</div>`;
+  if(ds<="2026-10-25"&&firstOpen)h+=`<div class="note">Första veckan: ${firstOpen} punkter kvar på checklistan under Plan.</div>`;
+  if(dow===0){const due=S.results.find(r=>r.date===ds);if(due)h+=`<div class="note">Uppföljningssöndag. Fyll i resultatloggen under Logg.</div>`}
+  h+=`<h2>Dagens pass</h2><p class="muted small">${work}. Välj ämne och tryck på det för att starta timern.</p><ul class="blocks">`;
+  blocks.forEach((b,i)=>{
+    const st=tm(b.s),en=tm(b.e),cls=nowM>=en?"done":(nowM>=st&&nowM<en?"now":"");
+    h+=`<li class="blk ${cls}"><div class="t">${b.s}–${b.e} <span class="muted small">${hm(b.m)}</span></div><div class="d">${esc(b.d)}</div><div class="chips">`;
+    b.o.forEach(k=>{h+=`<button class="chip ${SUBJ[k].v?"v":"k"}" data-start="${k}" data-min="${b.m}" title="${SUBJ[k].n}">${SUBJ[k].l}</button>`});
+    h+=`</div>${guideHtml(b)}</li>`;
+  });
+  h+=`</ul>`;
+  h+=`<h2>Logga tid i efterhand</h2><div class="row">
+   <div><label for="mSubj">Ämne</label><select id="mSubj">${ALL.map(k=>`<option value="${k}">${SUBJ[k].l} – ${SUBJ[k].n}</option>`).join("")}</select></div>
+   <div style="flex:0 1 110px"><label for="mMin">Minuter</label><input id="mMin" type="number" min="5" step="5" value="60"></div>
+   <div style="flex:0 0 auto"><button class="btn primary" id="mAdd">Logga</button></div></div>`;
+  const todays=S.sessions.filter(x=>x.date===ds);
+  if(todays.length){h+=`<ul class="list" style="margin-top:10px">`+todays.map(x=>`<li><span style="flex:1"><b>${SUBJ[x.subj].l}</b> ${hm(x.min)}</span><button class="btn sm ghost" data-delsess="${x.id}">Ta bort</button></li>`).join("")+`</ul>`}
+  h+=`<div class="note">Hellre 25 koncentrerade timmar än 30 trötta. Skydda sömnen, särskilt vid skiftbyte.</div>`;
+  return h;
+}
+
+function bubbles(min,budget){
+  const n=budget*2,full=Math.floor(min/30),half=(min%30)>=15;let s="";
+  for(let i=0;i<n;i++){s+=`<i class="${i<full?"f":(i===full&&half?"h":"")}"></i>`}
+  const extra=full-n; for(let i=0;i<Math.min(extra,4);i++)s+=`<i class="x" title="Över budget"></i>`;
+  return s;
+}
+function vVecka(){
+  const d=new Date(),wm=weekMinutes(d),t=weekType(d),mk=ymd(monday(d));
+  const v=VERB.reduce((a,k)=>a+wm[k],0),k=KV.reduce((a,x)=>a+wm[x],0),tot=v+k;
+  let h=header();
+  h+=`<h2>Veckans ämnesbudget</h2><p class="muted small">Varje ring är 30 minuter. Fyllda ringar är loggad tid, gula är tid över budget.</p><div class="sheet">`;
+  ALL.forEach(x=>{h+=`<div class="brow"><div class="bname ${SUBJ[x].v?"v":"k"}" title="${SUBJ[x].n}">${SUBJ[x].l}</div><div class="bub">${bubbles(wm[x],SUBJ[x].b)}</div><div class="bval">${hdec(wm[x])}/${String(SUBJ[x].b).replace(".",",")} h</div></div>`});
+  h+=`</div>`;
+  const vp=tot?Math.round(v/tot*100):0;
+  h+=`<div class="split"><span style="width:${tot?v/tot*100:0}%;background:var(--verb)"></span><span style="width:${tot?k/tot*100:0}%;background:var(--kvant)"></span></div>
+  <p class="small muted">Verbalt ${vp} % av loggad tid (mål ca 65 %). Totalt ${hdec(tot)} av 30 h.</p>`;
+  h+=`<h2>Veckotyp</h2><p class="small muted">Vecka ${isoWeek(d)} räknas som vecka ${t}. Skiftväxlingen efter vecka 44 är preliminär – ändra om ditt schema avviker.</p>
+  <div class="seg" role="group" aria-label="Veckotyp denna vecka"><button data-wt="A" class="${t==="A"?"on":""}">A · förmiddag</button><button data-wt="B" class="${t==="B"?"on":""}">B · eftermiddag</button></div>
+  ${S.settings.override[mk]?` <button class="btn sm ghost" data-wt="reset">Återställ</button>`:""}`;
+  const sv=schedView||t;
+  h+=`<h2>Schema</h2><div class="seg" role="group" aria-label="Visa schema"><button data-sv="A" class="${sv==="A"?"on":""}">Vecka A</button><button data-sv="B" class="${sv==="B"?"on":""}">Vecka B</button></div>`;
+  const S2=SCHED[sv];
+  const tbl=(title,bl)=>`<h3 style="margin:16px 0 6px">${title}</h3><div class="tbl"><table><thead><tr><th>Tid</th><th>Aktivitet</th><th>Längd</th></tr></thead><tbody>${bl.map(b=>`<tr><td style="white-space:nowrap">${b.s}–${b.e}</td><td>${b.o.length===8?"Valfritt ämne":b.o.map(x=>SUBJ[x].l).join(", ")} – ${esc(b.d)}</td><td style="white-space:nowrap">${hm(b.m)}</td></tr>`).join("")}</tbody></table></div><p class="small muted">Summa ${hm(bl.reduce((a,b)=>a+b.m,0))}</p>`;
+  h+=`<p class="small muted" style="margin-top:10px">${S2.work}</p>`;
+  h+=tbl(S2.fri?"Måndag–torsdag":"Måndag–fredag",S2.wd);
+  if(S2.fri)h+=tbl("Fredag",S2.fri);
+  h+=tbl("Lördag",S2.sat)+tbl("Söndag",SCHED.sun);
+  h+=`<div class="note">Felanalys, gamla prov och repetition ingår i respektive ämnes tid – de läggs inte ovanpå de 30 timmarna.</div>`;
+  return h;
+}
+
+function vOrd(){
+  const due=dueCards(),boxes=[0,1,2,3,4,5].map(b=>S.cards.filter(c=>c.box===b).length);
+  let h=header()+`<h2>ORD-kort</h2><p class="small muted">Rätt svar flyttar kortet en låda upp och längre fram i tiden. Fel svar skickar tillbaka det till låda 1.</p>`;
+  h+=`<div class="boxes">${boxes.map((n,i)=>`<div><b>${n}</b><span class="small muted">${i?"låda "+i:"ej börjat"}</span></div>`).join("")}</div>
+  <div class="row" style="margin:6px 0 4px"><div style="flex:0 1 180px"><label for="perDay">Nya ord per dag</label><select id="perDay">${[10,15,20,30,40].map(n=>`<option ${(S.settings.perDay||20)===n?"selected":""}>${n}</option>`).join("")}</select></div></div>`;
+  const q=cardState.q;
+  if(q.length&&cardState.i<q.length){
+    const c=S.cards.find(x=>x.id===q[cardState.i]);
+    if(c){
+      h+=`<div class="flash"><div class="small muted">${cardState.i+1} av ${q.length}</div><div class="w">${esc(c.w)}</div>
+      ${cardState.show?`<div class="m">${esc(c.m)}</div><div class="row" style="justify-content:center"><button class="btn" data-ans="0" style="flex:0 1 auto">Visste inte</button><button class="btn primary" data-ans="1" style="flex:0 1 auto">Visste</button></div>`
+      :`<div><button class="btn pencil" id="flip">Visa betydelse</button></div>`}</div>`;
+    }
+  }else{
+    h+=due.length?`<div class="flash"><div class="w">${due.length}</div><div>kort att repetera idag</div><div><button class="btn pencil" id="startRev">Börja förhöret</button></div></div>`
+      :`<div class="empty">${S.cards.length?"Inga kort att repetera idag. Lägg till nya ord nedan.":"Inga kort än. Lägg till ord du stöter på i ORD-uppgifter och läsförståelse."}</div>`;
+  }
+  h+=`<h2>Lägg till ord</h2><div class="row"><div><label for="cw">Ord</label><input id="cw" type="text" autocomplete="off"></div><div><label for="cm">Betydelse</label><input id="cm" type="text" autocomplete="off"></div><div style="flex:0 0 auto"><button class="btn primary" id="cAdd">Lägg till</button></div></div>`;
+  if(S.cards.length){
+    h+=`<details style="margin-top:14px"><summary>Alla ord (${S.cards.length})</summary><ul class="list">${S.cards.slice().reverse().map(c=>`<li><span style="flex:1"><b>${esc(c.w)}</b> – ${esc(c.m)} <span class="small muted">${c.box?`låda ${c.box}, nästa ${nice(c.due)}`:"ej börjat"}</span></span><button class="btn sm ghost" data-delcard="${c.id}">Ta bort</button></li>`).join("")}</ul></details>`;
+  }
+  return h;
+}
+
+function chart(){
+  const pts=S.results.filter(r=>r.kv!==""||r.ve!=="");
+  if(pts.length<1)return `<div class="empty">Diagrammet visas när du fyllt i första resultatet.</div>`;
+  const W=600,H=200,p=30,n=S.results.length;
+  const x=i=>p+(W-2*p)*(n>1?i/(n-1):0),y=v=>H-p-(H-2*p)*(v/80);
+  const line=(key,col)=>{const ps=S.results.map((r,i)=>r[key]===""?null:[x(i),y(+r[key])]).filter(Boolean);
+    return ps.length?`<polyline fill="none" stroke="${col}" stroke-width="3" points="${ps.map(q=>q.join(",")).join(" ")}"/>`+ps.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="5" fill="${col}"/>`).join(""):""};
+  let g="";[0,20,40,60,80].forEach(v=>{g+=`<line x1="${p}" x2="${W-p}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="4" y="${y(v)+4}" font-size="11" fill="var(--muted)">${v}</text>`});
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Antal rätt över tid">${g}${line("ve","var(--verb)")}${line("kv","var(--kvant)")}</svg>
+  <p class="small"><span style="color:var(--verb);font-weight:700">● Verbal</span> &nbsp; <span style="color:var(--kvant);font-weight:700">● Kvant</span> &nbsp;<span class="muted">rätt av 80</span></p></div>`;
+}
+function vLogg(){
+  let h=header()+`<h2>Resultatlogg</h2><p class="small muted">Fyll i varannan söndag.</p>`+chart();
+  h+=`<div class="tbl" style="margin-top:10px"><table><thead><tr><th>Datum</th><th>Kvant /80</th><th>Verbal /80</th><th>Viktigaste feltyp</th><th>Åtgärd till nästa gång</th></tr></thead><tbody>`;
+  const td=today();
+  S.results.forEach((r,i)=>{
+    const fut=r.date>td;
+    h+=`<tr style="${fut?"opacity:.55":""}"><td style="white-space:nowrap"><b>${nice(r.date)}</b></td>
+    <td><input type="number" min="0" max="80" data-res="${i}" data-f="kv" value="${esc(r.kv)}" aria-label="Kvant rätt ${nice(r.date)}"></td>
+    <td><input type="number" min="0" max="80" data-res="${i}" data-f="ve" value="${esc(r.ve)}" aria-label="Verbal rätt ${nice(r.date)}"></td>
+    <td><select data-res="${i}" data-f="typ" aria-label="Feltyp"><option value=""></option>${ERRT.map(e=>`<option ${r.typ===e?"selected":""}>${e}</option>`).join("")}</select></td>
+    <td><input type="text" data-res="${i}" data-f="act" value="${esc(r.act)}" style="min-width:160px" aria-label="Åtgärd"></td></tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  h+=`<h2>Felanalys</h2><div class="row"><div><label for="eS">Ämne</label><select id="eS">${ALL.map(k=>`<option value="${k}">${SUBJ[k].l}</option>`).join("")}</select></div>
+  <div><label for="eT">Feltyp</label><select id="eT">${ERRT.map(e=>`<option>${e}</option>`).join("")}</select></div></div>
+  <div style="margin-top:8px"><label for="eN">Vad gick fel och vad gör du nästa gång?</label><textarea id="eN"></textarea></div>
+  <div style="margin-top:8px"><button class="btn primary" id="eAdd">Spara felet</button></div>`;
+  if(S.errors.length){
+    const cnt={};ERRT.forEach(e=>cnt[e]=0);S.errors.forEach(e=>cnt[e.t]++);const mx=Math.max(...Object.values(cnt),1);
+    h+=`<div class="err-bars" style="margin-top:16px">${ERRT.map(e=>`<div><span>${e}</span><span class="bar" style="width:${cnt[e]/mx*100}%"></span><b>${cnt[e]}</b></div>`).join("")}</div>`;
+    const bys={};S.errors.forEach(e=>bys[e.s]=(bys[e.s]||0)+1);
+    h+=`<p class="small muted">Flest fel: ${Object.entries(bys).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>SUBJ[k].l+" ("+n+")").join(", ")}</p>`;
+    h+=`<details><summary>Alla fel (${S.errors.length})</summary><ul class="list">${S.errors.slice().reverse().map(e=>`<li><span style="flex:1"><b>${SUBJ[e.s].l}</b> · ${e.t} <span class="small muted">${nice(e.date)}</span><br>${esc(e.n)}</span><button class="btn sm ghost" data-delerr="${e.id}">Ta bort</button></li>`).join("")}</ul></details>`;
+  }
+  h+=`<h2>Matterepetition</h2><p class="small muted">Markera ett område först när du gjort fel där. Bocka av när det sitter.</p><ul class="list">`;
+  MATH.forEach(m=>{const s=S.math[m]||{};
+    h+=`<li><input class="check" type="checkbox" data-math="${m}" data-f="done" ${s.done?"checked":""} ${s.seen?"":"disabled"} aria-label="${m} klart"><span style="flex:1">${m}${s.seen?(s.done?' <span class="small muted">sitter</span>':' <span class="tag">att repetera</span>'):' <span class="small muted">inga fel än</span>'}</span>
+    <button class="btn sm ghost" data-math="${m}" data-f="seen">${s.seen?"Inga fel":"Fel här"}</button></li>`});
+  h+=`</ul>`;
+  return h;
+}
+
+function vPlan(){
+  const td=today();let h=header();
+  if(td<="2026-11-01"||FIRSTWEEK.some((_,i)=>!S.first[i])){
+    h+=`<h2>Första veckan, 19–25 oktober</h2><ul class="list">${FIRSTWEEK.map((t,i)=>`<li><input class="check" type="checkbox" data-first="${i}" ${S.first[i]?"checked":""} id="f${i}"><label for="f${i}" style="color:var(--ink);font-size:1rem;margin:0;flex:1">${t}</label></li>`).join("")}</ul>`;
+  }
+  h+=`<h2>Sexmånadersplan</h2>`;
+  PERIODS.forEach(([a,b,t])=>{
+    const cur=td>=a&&(!b||td<=b),past=b&&td>b;
+    h+=`<div class="period ${cur?"cur":""} ${past?"past":""}"><div class="small muted">${nice(a)} – ${b?nice(b):"provet"}${cur?'<span class="tag">nu</span>':""}</div><div><b>${t}</b></div></div>`;
+  });
+  h+=`<h2>Inställningar</h2><div class="row"><div><label for="exam">Provdatum</label><input id="exam" type="date" value="${esc(S.settings.exam)}"></div></div>
+  <label style="display:flex;gap:10px;align-items:center;color:var(--ink);font-size:1rem;margin-top:14px"><input class="check" type="checkbox" id="snd" ${S.settings.sound!==false?"checked":""}> Ljud och vibration när ett pass är slut</label>
+  <p class="small muted">Mål: över 1,55, arbetsmål 1,60. Start 19 oktober 2026. Cirka 30 h/vecka, varav cirka 65 % verbalt.</p>
+  <h3 style="margin-top:18px">Säkerhetskopia</h3><p class="small muted">Dina data sparas automatiskt. Här kan du också kopiera ut dem eller läsa in en kopia.</p>
+  <div class="row" style="margin-bottom:8px"><button class="btn sm primary" id="bkDl" style="flex:0 0 auto">Ladda ner som fil</button><label class="btn sm ghost" style="flex:0 0 auto;margin:0;color:var(--ink);font-size:.875rem">Läs in fil<input type="file" id="bkFile" accept=".json,application/json" hidden></label></div>
+  <button class="btn sm ghost" id="bk">${showBackup?"Dölj":"Visa säkerhetskopia"}</button>
+  ${showBackup?`<textarea id="bkt" style="margin-top:8px;min-height:120px;font-size:.75rem">${esc(JSON.stringify(S))}</textarea><div class="row" style="margin-top:6px"><button class="btn sm" id="bkIn" style="flex:0 0 auto">Läs in från rutan</button></div>`:""}`;
+  return h;
+}
+
+function drillHtml(){
+  const b=S.drill.best;
+  if(!drill){
+    const btns=Object.keys(TOPICS).map(t=>`<button class="btn sm ghost" data-topic="${t}" style="flex:0 0 auto">${t}</button>`).join("");
+    return `<p>Egna uppgifter i provets stil – samma huvudräkning som XYZ och KVA bygger på. Svara med siffror, decimaler med komma. Välj ett område eller kör tio blandade.</p>
+    <div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${btns}</div>
+    <p class="small muted">${S.drill.rounds?`${S.drill.rounds} omgångar gjorda. Bästa blandade: ${b?`${b.score}/10 på ${b.sec} s`:"–"}.`:"Ingen omgång gjord än."}</p>
+    <button class="btn pencil" id="drillStart">Starta 10 blandade</button>`;
+  }
+  if(drill.i<drill.qs.length)return `<div class="flash">${drill.topic?`<div class="small muted">${drill.topic}</div>`:""}<div class="small muted">${drill.i+1} av ${drill.qs.length}</div><div class="drillq">${drill.qs[drill.i].q}</div>
+    <div class="row" style="justify-content:center"><input id="drillIn" type="text" inputmode="decimal" autocomplete="off" style="max-width:160px;text-align:center;font-size:1.2rem" aria-label="Ditt svar"><button class="btn primary" id="drillOk" style="flex:0 0 auto">Svara</button></div>
+    <div><button class="btn sm ghost" id="drillQuit">Avbryt</button></div></div>`;
+  const sc=drill.res.filter(r=>r.ok).length,wr=drill.res.filter(r=>!r.ok),n=drill.qs.length;
+  const again=drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
+  return `<div class="flash"><div class="w">${sc}/${n}</div><div>på ${drill.sec} sekunder${drill.topic?` · ${drill.topic}`:""}</div>
+    ${wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.q.replace(/<br>.*$/,"")}: <span class="wrong">${esc(r.g)}</span> → <span class="right">${String(r.a).replace(".",",")}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
+    <div class="row" style="justify-content:center">${again}<button class="btn ghost" id="drillQuit" style="flex:0 0 auto">Klar</button></div></div>`;
+}
+function vMaterial(){
+  const td=today(),days=Math.ceil((parse(EXAM_DATE)-parse(td))/864e5);
+  const ul=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  let h=header()+`<div class="mat">`;
+  h+=`<h2>Provdagen</h2><p><b>Lördag 10 april 2027</b>${days>0?` – ${days} dagar kvar`:""}. Anmälan är öppen 7–14 januari 2027 på <a href="https://www.hogskoleprov.nu" target="_blank" rel="noopener">hogskoleprov.nu</a>. Det finns ingen efteranmälan, så skapa kontot i förväg.</p>`;
+  h+=`<h2>Så ser provet ut</h2><p class="small muted">Fyra provpass räknas: två verbala och två kvantitativa med 40 uppgifter på 55 minuter vardera. Varje del ger högst 80 rätt. Fel svar ger inga minuspoäng, så fyll alltid i allt.</p>`;
+  const ft=(title,keys)=>`<h3 style="margin:12px 0 6px">${title}</h3><div class="tbl"><table><thead><tr><th>Delprov</th><th>Uppgifter</th><th>Tid</th><th>Per uppgift</th></tr></thead><tbody>${keys.map(k=>`<tr><td><b>${SUBJ[k].l}</b> <span class="muted">${SUBJ[k].n}</span></td><td>${FORMAT[k][0]}</td><td>${FORMAT[k][1]} min</td><td>≈ ${Math.round(FORMAT[k][1]*60/FORMAT[k][0])} s</td></tr>`).join("")}</tbody></table></div>`;
+  h+=ft("Verbalt provpass, i ordning",["ORD","LAS","MEK","ELF"])+ft("Kvantitativt provpass, i ordning",["XYZ","KVA","NOG","DTK"]);
+  h+=`<p class="small muted" style="margin-top:8px">Tiderna är provets egna rekommendationer. ORD går snabbt så att LÄS och ELF får mer tid.</p>`;
+  h+=`<h2>Delprovsguider</h2>`;
+  ALL.forEach(k=>{const d=DELPROV[k];
+    h+=`<details><summary>${SUBJ[k].l} – ${SUBJ[k].n}</summary>${d.opt?`<p><b>Svarsalternativen är alltid desamma</b></p>${ul(d.opt)}`:""}<p><b>Metod</b></p>${ul(d.s)}<p><b>Vanliga fällor</b></p>${ul(d.f)}<p><b>Så tränar du nu</b></p><p>${GUIDE[k][phase()]}</p></details>`});
+  h+=`<h2>Mattebladet</h2><p class="small muted">Gå igenom ett område först när du gjort fel där – det följer din repetitionslista under Logg.</p>`;
+  MATHSHEET.forEach(([t,rows])=>{h+=`<details><summary>${t}</summary><div class="formula">${rows.map(([a,b])=>`<div><b>${a}</b></div><div>${b}</div>`).join("")}</div></details>`});
+  h+=`<h2>Träna uppgifter</h2>`+drillHtml();
+  h+=`<h2>ORD-paketet</h2><p>${STARTWORDS.length} ord av den typ som brukar dyka upp i ORD: lånord, abstrakta begrepp och äldre svenska ord, med korta förklaringar. De läggs i dina ORD-kort och släpps in ${S.settings.perDay||20} nya per dag – ändra takten under ORD.</p>
+    <button class="btn ${S.pack?"ghost":"primary"}" id="pack">${S.pack?"Lägg till saknade ord igen":"Lägg till i ORD-korten"}</button>`;
+  h+=`<h2>Gamla prov</h2><p>Hämta provpass och facit gratis på <a href="https://www.studera.nu/hogskoleprovet" target="_blank" rel="noopener">studera.nu/hogskoleprovet</a>. Använd dem i den här ordningen så att de nyaste proven finns kvar till slutet:</p>
+    ${ul(["Fram till 10 januari: lösa delprov ur äldre prov (2012–2021) för att träna metod.","11 januari–7 februari: hela provpass ur 2022–2023.","8 februari–7 mars: 2024–2025 på tid.","Från 8 mars: de tre senaste proven som fullskaliga simuleringar, hela provdagen i ett svep."])}
+    <p class="small muted">Jämför ditt antal rätt med normeringstabellen för samma prov på studera.nu – den visar vilken normerad poäng det motsvarar.</p>
+    <div class="tbl"><table><thead><tr><th>Prov</th><th>Används till</th><th>Gjort</th><th>Kvant /80</th><th>Verbal /80</th></tr></thead><tbody>
+    ${OLDEXAMS.map(([d,u])=>{const o=S.exams[d]||{};return `<tr><td style="white-space:nowrap"><b>${nice(d)} ${d.slice(0,4)}</b></td><td class="small">${u}</td><td><input class="check" type="checkbox" data-ex="${d}" data-f="done" ${o.done?"checked":""} aria-label="Gjort ${d}"></td><td><input type="number" min="0" max="80" data-ex="${d}" data-f="kv" value="${esc(o.kv)}" aria-label="Kvant ${d}"></td><td><input type="number" min="0" max="80" data-ex="${d}" data-f="ve" value="${esc(o.ve)}" aria-label="Verbal ${d}"></td></tr>`}).join("")}
+    </tbody></table></div>`;
+  h+=`<h2>Läsmaterial</h2>
+    <details><summary>Svenska (LÄS och ORD)</summary>${ul(["Forskning &amp; Framsteg och Populär Historia – populärvetenskap i samma stil som LÄS-texterna.","Debatt- och kultursidorna i DN och SvD – argumenterande texter med svårare ord.","Språktidningen – bra för ordförråd och språkkänsla."])}<p>En längre text om dagen. Skriv huvudtesen i en mening och lägg okända ord i ORD-korten.</p></details>
+    <details><summary>Engelska (ELF)</summary>${ul(["The Guardian, särskilt de långa reportagen.","The Economist – tät argumentation.","BBC Future och Scientific American – vetenskap på C1-nivå.","Aeon – essäer om idéer och samhälle."])}<p>Läs med en fråga i huvudet: vad vill skribenten övertyga mig om?</p></details>
+    <details><summary>Matte</summary><p>Matteboken.se har gratis genomgångar på gymnasienivå för alla områden i mattebladet. Titta på genomgången, gör några uppgifter och gå sedan tillbaka till XYZ ur gamla prov.</p></details>`;
+  return h+`</div>`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  const app=document.getElementById("app");
+  app.innerHTML=({idag:vIdag,vecka:vVecka,ord:vOrd,material:vMaterial,logg:vLogg,plan:vPlan}[tab])();
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
+  renderTimer();
+}
+function go(t){tab=t;history.replaceState(null,"","#"+t);render();window.scrollTo(0,0)}
+
+/* ---------- timer ---------- */
+function renderTimer(){
+  const el=document.getElementById("timer");
+  if(!S.timer){el.classList.remove("on");return}
+  el.classList.add("on");
+  const sec=Math.floor((Date.now()-S.timer.start)/1000),pm=S.timer.plan*60;
+  document.getElementById("clock").textContent=pad(Math.floor(sec/60))+":"+pad(sec%60);
+  document.getElementById("tlbl").textContent=SUBJ[S.timer.subj].l+(sec>=pm?" · passet är slut":" · "+hm(Math.ceil((pm-sec)/60))+" kvar");
+  if(sec>=pm&&!S.timer.rang){S.timer.rang=true;save();if(S.settings.sound!==false){beep();try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}}toast("Passet är slut – tryck Spara")}
+}
+setInterval(()=>{if(S.timer)renderTimer()},1000);
+function logSession(subj,min,date){S.sessions.push({id:uid(),date:date||today(),subj,min});save()}
+
+/* ---------- events ---------- */
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(b)go(b.dataset.tab)});
+document.getElementById("tstop").onclick=()=>{
+  const t=S.timer;if(!t)return;const min=Math.round((Date.now()-t.start)/60000);
+  S.timer=null;
+  if(min>=1){logSession(t.subj,min,ymd(new Date(t.start)));toast(hm(min)+" "+SUBJ[t.subj].l+" sparat")}else{save();toast("För kort pass – inget sparat")}
+  render();
+};
+document.getElementById("tcancel").onclick=()=>{S.timer=null;save();render()};
+
+document.getElementById("app").addEventListener("click",e=>{
+  const el=e.target.closest("button,input");if(!el)return;const ds=el.dataset;
+  if(ds.start){
+    if(S.timer){toast("Spara eller avbryt pågående pass först");return}
+    ensureAudio();S.timer={subj:ds.start,start:Date.now(),plan:+ds.min};save();render();toast("Timer startad");
+  }
+  else if(el.id==="mAdd"){const m=+document.getElementById("mMin").value;if(!(m>0)){toast("Ange minuter");return}
+    const s=document.getElementById("mSubj").value;logSession(s,m);toast(hm(m)+" "+SUBJ[s].l+" sparat");render()}
+  else if(ds.delsess){S.sessions=S.sessions.filter(x=>x.id!==ds.delsess);save();render()}
+  else if(ds.wt){const k=ymd(monday(new Date()));if(ds.wt==="reset")delete S.settings.override[k];else S.settings.override[k]=ds.wt;schedView=null;save();render()}
+  else if(ds.sv){schedView=ds.sv;render()}
+  else if(el.id==="cAdd"){const w=document.getElementById("cw").value.trim(),m=document.getElementById("cm").value.trim();
+    if(!w||!m){toast("Fyll i både ord och betydelse");return}
+    S.cards.push({id:uid(),w,m,box:1,due:today()});save();render();toast("Ordet är tillagt");document.getElementById("cw").focus()}
+  else if(el.id==="startRev"){cardState={q:dueCards().map(c=>c.id).sort(()=>Math.random()-.5),i:0,show:false};render()}
+  else if(el.id==="flip"){cardState.show=true;render()}
+  else if(ds.ans!==undefined){
+    const c=S.cards.find(x=>x.id===cardState.q[cardState.i]);
+    if(c&&c.box===0){if(S.newDay!==today()){S.newDay=today();S.newCount=0}S.newCount=(S.newCount||0)+1}
+    if(c){if(ds.ans==="1"){c.box=Math.min(5,c.box+1);c.due=ymd(addDays(new Date(),LEIT[c.box]))}
+      else{c.box=1;c.due=today();cardState.q.push(c.id)}}
+    cardState.i++;cardState.show=false;save();
+    if(cardState.i>=cardState.q.length){cardState={q:[],i:0,show:false};toast("Förhöret är klart")}
+    render();
+  }
+  else if(ds.delcard){S.cards=S.cards.filter(x=>x.id!==ds.delcard);save();render()}
+  else if(el.id==="eAdd"){const n=document.getElementById("eN").value.trim();
+    S.errors.push({id:uid(),date:today(),s:document.getElementById("eS").value,t:document.getElementById("eT").value,n});save();render();toast("Felet är sparat")}
+  else if(ds.delerr){S.errors=S.errors.filter(x=>x.id!==ds.delerr);save();render()}
+  else if(ds.math&&el.tagName==="BUTTON"){const s=S.math[ds.math]||(S.math[ds.math]={});s.seen=!s.seen;if(!s.seen)s.done=false;save();render()}
+  else if(el.id==="pack"){const have=new Set(S.cards.map(c=>c.w.toLowerCase()));let n=0;
+    STARTWORDS.forEach(([w,m])=>{if(!have.has(w.toLowerCase())){S.cards.push({id:uid(),w,m,box:0,due:today()});have.add(w.toLowerCase());n++}});
+    S.pack=true;save();render();toast(n?n+" ord tillagda – "+(S.settings.perDay||20)+" nya per dag":"Alla ord finns redan")}
+  else if(el.id==="drillStart"){drill={qs:Array.from({length:10},()=>pickr(GEN)()),i:0,start:Date.now(),res:[]};render();focusDrill()}
+  else if(ds.topic){drill={qs:Array.from({length:10},()=>pickr(TOPICS[ds.topic])()),i:0,start:Date.now(),res:[],topic:ds.topic};render();focusDrill()}
+  else if(el.id==="drillOk"){const inp=document.getElementById("drillIn");const raw=inp.value.trim();if(!raw){inp.focus();return}
+    const v=parseFloat(raw.replace(",",".").replace("−","-")),q=drill.qs[drill.i];
+    drill.res.push({q:q.q,a:q.a,g:raw,ok:Math.abs(v-q.a)<0.011});drill.i++;
+    if(drill.i>=drill.qs.length){drill.sec=Math.round((Date.now()-drill.start)/1000);const sc=drill.res.filter(r=>r.ok).length;
+      S.drill.rounds++;if(!drill.topic){const b=S.drill.best;if(!b||sc>b.score||(sc===b.score&&drill.sec<b.sec))S.drill.best={score:sc,sec:drill.sec}}save()}
+    render();focusDrill()}
+  else if(el.id==="drillQuit"){drill=null;render()}
+  else if(el.id==="bkDl"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:"application/json"}));a.download="hp-plugg-"+today()+".json";document.body.appendChild(a);a.click();a.remove();toast("Säkerhetskopian är nedladdad")}
+  else if(el.id==="bk"){showBackup=!showBackup;render()}
+  else if(el.id==="bkIn"){try{const o=JSON.parse(document.getElementById("bkt").value);if(!o||!Array.isArray(o.sessions))throw 0;S=Object.assign(defaults(),o);save();showBackup=false;render();toast("Kopian är inläst")}catch(_){toast("Rutan innehåller ingen giltig kopia")}}
+});
+document.getElementById("app").addEventListener("change",e=>{
+  const el=e.target,ds=el.dataset;
+  if(ds.res!==undefined){S.results[+ds.res][ds.f]=el.value;save();if(ds.f==="kv"||ds.f==="ve"){const c=document.querySelector(".chart");if(c)c.outerHTML=chart()}}
+  else if(ds.first!==undefined){S.first[ds.first]=el.checked;save()}
+  else if(ds.math&&el.type==="checkbox"){(S.math[ds.math]||(S.math[ds.math]={})).done=el.checked;save();render()}
+  else if(el.id==="exam"){S.settings.exam=el.value;save()}
+  else if(el.id==="bkFile"&&el.files[0]){el.files[0].text().then(t=>{const o=JSON.parse(t);if(!o||!Array.isArray(o.sessions))throw 0;S=Object.assign(defaults(),o);fix();save();render();toast("Kopian är inläst")}).catch(()=>toast("Filen är ingen giltig kopia"))}
+  else if(ds.ex){const o=S.exams[ds.ex]||(S.exams[ds.ex]={});o[ds.f]=el.type==="checkbox"?el.checked:el.value;save()}
+  else if(el.id==="perDay"){S.settings.perDay=+el.value;save();render()}
+  else if(el.id==="snd"){S.settings.sound=el.checked;save();if(el.checked){ensureAudio();beep()}}
+});
+document.getElementById("app").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&(e.target.id==="cw"||e.target.id==="cm")){document.getElementById("cAdd").click()}
+  else if(e.key==="Enter"&&e.target.id==="drillIn"){document.getElementById("drillOk").click()}
+});
+window.addEventListener("hashchange",()=>{const t=location.hash.replace("#","");if(TABS.includes(t)&&t!==tab){tab=t;render()}});
+render();
+</script>
+</body>
+</html>

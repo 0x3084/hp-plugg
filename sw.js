@@ -1,5 +1,5 @@
 // Service worker: gör att appen fungerar offline efter första besöket.
-const CACHE = "hp-plugg-v4";
+const CACHE = "hp-plugg-v5";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {

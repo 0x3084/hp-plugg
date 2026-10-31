@@ -132,6 +132,21 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .opt:hover{border-color:var(--ink)}
 .opt .ol{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 26px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:var(--font-b);font-weight:700;font-size:.85rem}
 .opt .ot{font-size:1.2rem}
+.exam-progress{margin:0 0 8px;color:var(--muted);font-size:.85rem}
+.flash.exam-sheet{background:#fff;color:#202124;text-align:left;border:1px solid #d9d9d9;border-radius:8px;padding:20px 22px;min-height:0;display:block;box-shadow:0 1px 3px #0000000d}
+.exam-head{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
+.exam-number{font-size:1rem;font-weight:700;line-height:1.55}
+.exam-prompt{min-width:0;font-size:1.05rem;line-height:1.5}
+.exam-prompt .drillq{font-family:var(--font-b);font-weight:400;font-size:1.05rem;line-height:1.5;word-break:normal}
+.exam-prompt .drillq .rule{display:none}
+.exam-prompt .drillq svg{width:min(480px,100%);margin:12px 0 14px;padding:0;background:#fff;border-radius:0}
+.exam-prompt .drillq svg text{font-size:14px}
+.exam-sheet .opts{display:flex;flex-direction:column;gap:0;margin:12px 0 12px 38px;max-width:620px}
+.exam-sheet .opt{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:center;background:#fff;color:#202124;border:0;border-bottom:1px solid #ededed;border-radius:0;padding:8px 5px;font-family:var(--font-b);font-weight:400}
+.exam-sheet .opt:hover{background:#f5f5f5}
+.exam-sheet .opt .ol{display:block;width:auto;height:auto;flex:auto;border-radius:0;background:transparent;color:#202124;text-align:left;font-size:1rem}
+.exam-sheet .opt .ot{font-size:1rem;font-weight:400}
+.exam-sheet .exam-controls{margin:10px 0 0 38px}
 .boxes{display:flex;gap:6px;margin:10px 0}
 .boxes div{flex:1;background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:6px;text-align:center}
 .boxes b{display:block;font-family:var(--font-h);font-size:1.2rem}
@@ -526,7 +541,7 @@ const TOPICS={
   ()=>{const g=rint(35,145);return{q:`${angleSvg("sameSide",g)}<span class="rule">Inre vinklar på samma sida: C-form, L₁ ∥ L₂</span><br>x = ?`,a:180-g,unit:"°"}},
   ()=>{const g=rint(35,145);return{q:`${angleSvg("line",g)}<span class="rule">Sidovinklar på en rak linje (supplementvinklar)</span><br>x = ?`,a:180-g,unit:"°"}},
   ()=>{const g=rint(20,70);return{q:`${angleSvg("right",g)}<span class="rule">Komplementvinklar: tillsammans en rät vinkel</span><br>x = ?`,a:90-g,unit:"°"}},
-  ()=>{const a=rint(55,145),b=rint(45,Math.min(150,315-a)),x=360-a-b;return{q:`En punkt omges av tre vinklar: ${a}°, ${b}° och x°.<br><span class="small muted">Vinklar runt en punkt</span>`,a:x,unit:"°"}},
+  ()=>{const a=rint(55,145),b=rint(45,Math.min(150,315-a)),x=360-a-b;return{q:`Tre vinklar runt samma punkt är ${a}°, ${b}° och x°. Hur stor är x?`,a:x,unit:"°"}},
   ()=>{const a=rint(35,75),b=rint(35,Math.min(75,140-a)),x=180-a-b;return{q:`${angleSvg("triangle",a,b)}<span class="rule">Triangelns vinkelsumma</span><br>x = ?`,a:x,unit:"°"}},
   ()=>{const a=rint(35,75),b=rint(35,75),x=a+b;return{q:`En triangel har två motstående inre vinklar ${a}° och ${b}°. Yttervinkeln är x°.<br><span class="rule">Triangelns yttervinkel</span>`,a:x,unit:"°"}},
   ()=>{const apex=2*rint(20,60),base=(180-apex)/2;return{q:`${angleSvg("isosceles",apex)}<span class="rule">Likbent triangel: basvinklarna är lika</span><br>x = ?`,a:base,unit:"°"}}
@@ -834,11 +849,11 @@ function drillHtml(){
   const L=["A","B","C","D"];
   if(drill.i<drill.qs.length){
     const q=drill.qs[drill.i];
-    const wide=q.opts.some(o=>o.replace(/<[^>]+>/g,"").length>10);
     const opts=q.opts.map((o,idx)=>`<button class="opt" data-opt="${idx}"><span class="ol">${L[idx]}</span><span class="ot">${o}</span></button>`).join("");
-    return `<div class="flash">${drill.topic?`<div class="small muted">${drill.topic}</div>`:""}<div class="small muted">${drill.i+1} av ${drill.qs.length}</div><div class="drillq">${q.q}</div>
-    <div class="opts${wide?" col":""}">${opts}</div>
-    <div><button class="btn sm ghost" id="drillQuit">Avbryt</button></div></div>`;
+    return `<div class="exam-progress">${drill.topic?`${esc(drill.topic)} · `:""}Fråga ${drill.i+1} av ${drill.qs.length}</div>
+    <section class="flash exam-sheet" aria-label="Fråga ${drill.i+1}"><div class="exam-head"><div class="exam-number">${drill.i+1}.</div><div class="exam-prompt"><div class="drillq">${q.q}</div></div></div>
+    <div class="opts">${opts}</div>
+    <div class="exam-controls"><button class="btn sm ghost" id="drillQuit">Avbryt</button></div></section>`;
   }
   const sc=drill.res.filter(r=>r.ok).length,wr=drill.res.filter(r=>!r.ok),n=drill.qs.length;
   const again=drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;

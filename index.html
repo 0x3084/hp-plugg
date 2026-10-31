@@ -120,9 +120,9 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .drillq .rt{display:inline-flex;align-items:flex-start}
 .drillq .rt .rad{border-top:2.5px solid currentColor;padding:3px 3px 0;margin-left:1px}
 .drillq .rt .ix{font-size:.5em;align-self:flex-start;margin-right:-1px}
-.drillq .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 3px;font-size:.82em}
-.drillq .frac .num{border-bottom:2.5px solid currentColor;padding:0 6px 2px}
-.drillq .frac .den{padding:2px 6px 0}
+.frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;margin:0 3px;font-size:.88em;line-height:1.1}
+.frac .num{border-bottom:2px solid currentColor;padding:0 6px 2px}
+.frac .den{padding:2px 6px 0}
 .drillq .kva{display:flex;flex-direction:column;gap:12px;align-items:center;margin-bottom:10px}
 .drillq .kva>div{display:flex;align-items:center;gap:12px}
 .drillq .kva .kl{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 30px;border:2px solid currentColor;border-radius:50%;font-size:1rem;font-weight:700}
@@ -137,15 +137,20 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .exam-head{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;align-items:start}
 .exam-number{font-size:1rem;font-weight:700;line-height:1.55}
 .exam-prompt{min-width:0;font-size:1.05rem;line-height:1.5}
-.exam-prompt .drillq{font-family:var(--font-b);font-weight:400;font-size:1.05rem;line-height:1.5;word-break:normal}
+.exam-prompt .drillq{font-family:Arial,Helvetica,sans-serif;font-weight:400;font-size:1.05rem;line-height:1.5;word-break:normal;font-variant-numeric:lining-nums tabular-nums}
 .exam-prompt .drillq .rule{display:none}
+.exam-prompt .drillq .rt,.exam-prompt .drillq .frac{color:#202124;font-family:"Cambria Math","Times New Roman",serif}
+.exam-prompt .drillq .rt span,.exam-prompt .drillq .frac span{color:#202124}
 .exam-prompt .drillq svg{width:min(480px,100%);margin:12px 0 14px;padding:0;background:#fff;border-radius:0}
 .exam-prompt .drillq svg text{font-size:14px}
 .exam-sheet .opts{display:flex;flex-direction:column;gap:0;margin:12px 0 12px 38px;max-width:620px}
 .exam-sheet .opt{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;align-items:center;background:#fff;color:#202124;border:0;border-bottom:1px solid #ededed;border-radius:0;padding:8px 5px;font-family:var(--font-b);font-weight:400}
 .exam-sheet .opt:hover{background:#f5f5f5}
 .exam-sheet .opt .ol{display:block;width:auto;height:auto;flex:auto;border-radius:0;background:transparent;color:#202124;text-align:left;font-size:1rem}
-.exam-sheet .opt .ot{font-size:1rem;font-weight:400}
+.exam-sheet .opt .ot{font-family:Arial,Helvetica,sans-serif;font-size:1rem;font-weight:400;font-variant-numeric:lining-nums tabular-nums;color:#202124}
+.exam-sheet .opt .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;font-family:"Cambria Math","Times New Roman",serif;font-size:.92em;line-height:1.1;color:#202124}
+.exam-sheet .opt .frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 2px}
+.exam-sheet .opt .frac .den{padding:2px 5px 0}
 .exam-sheet .exam-controls{margin:10px 0 0 38px}
 .boxes{display:flex;gap:6px;margin:10px 0}
 .boxes div{flex:1;background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:6px;text-align:center}
@@ -407,6 +412,9 @@ const comma=x=>String(x).replace("-","−").replace(".",",");
 const rot=x=>`<span class="rt">√<span class="rad">${x}</span></span>`;
 const cbrt=x=>`<span class="rt"><span class="ix">3</span>√<span class="rad">${x}</span></span>`;
 const brak=(n,d)=>`<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const simpleFraction=(n,d)=>{const sign=n<0?"−":"",g=gcd(Math.abs(n),d)||1;n=Math.abs(n)/g;d/=g;return d===1?sign+n:`${sign}${brak(n,d)}`};
+const fractionMC=(q,n,d,unit="")=>{const vals=shuffled([...new Set([n,n+1,n-1,n+2])]);return{q,opts:vals.map(v=>simpleFraction(v,d)+unit),ci:vals.indexOf(n)}};
 function distract(a){
   const set=new Set(), int=Number.isInteger(a);
   const cand=int?[a+1,a-1,a+2,a-2,a+3,a-3,a+5,a*2,Math.round(a/2)]
@@ -564,10 +572,13 @@ const TOPICS={
   ()=>{const pumps=pickr([4,6,8,10,12,14]),mins=pickr([18,24,30,36,42,48]),volume=pickr([3,4,5,6,7,8]);const pumpFactor=3,volFactor=2;return{q:`${pumps} pumpar fyller ${volume} m³ på ${mins} minuter.<br><span class="small muted">Hur lång tid tar ${pumps*pumpFactor} pumpar att fylla ${volume*volFactor} m³?</span>`,a:mins*volFactor/pumpFactor,unit:" min"}},
   ()=>{const pumps=pickr([4,6,8,10,12,14]),mins=pickr([20,30,40]),volume=pickr([2,3,4,5,6,7]),time=mins*3,opts=KVAOPTS.slice();return{q:kvaBody(`Tiden för ${pumps*3} pumpar att fylla ${volume*9} m³`,`90 minuter`,`Utgångsläge: ${pumps} pumpar fyller ${volume} m³ på ${mins} minuter.`),opts,ci:time>90?0:time<90?1:2}},
   ()=>{const pumps=pickr([3,4,5,6,8,10]),vol=pickr([2,3,4,5,6]),mins=pickr([10,15,20,30]);return{q:`${pumps} likadana pumpar fyller ${vol} m³ på ${mins} minuter.<br><span class="small muted">Hur många m³ fyller de på ${mins*2} minuter?</span>`,a:vol*2,unit:" m³"}},
-  ()=>{const n=pickr([4,6,8,10,12]),t=pickr([15,20,30,40]),v=pickr([2,3,4,5]);return{q:`${n} pumpar fyller ${v} m³ på ${t} minuter.<br><span class="small muted">Vilket är pumparnas sammanlagda flöde i m³/min?</span>`,a:v/t}}
+  ()=>{const n=pickr([6,8,10,12,14,16]),t=pickr([20,24,30,36,40,45,60]),v=pickr([2,3,4,5,6,7,8]);const q=`${n} pumpar fyller ${v} m³ på ${t} minuter.<br><span class="small muted">Vad är deras sammanlagda flöde per minut? Svara som bråk.</span>`;return fractionMC(q,v,t," m³/min")},
+  ()=>{const n=pickr([4,6,8,10,12,14]),t=pickr([20,24,30,36,40,45,60]),v=pickr([2,3,4,5,6,7]);const q=`${n} likadana pumpar fyller ${v} m³ på ${t} minuter.<br><span class="small muted">Hur mycket vatten pumpar en pump per minut? Svara som bråk.</span>`;return fractionMC(q,v,n*t," m³/min")},
+  ()=>{const n=pickr([4,6,8,10,12]),t=pickr([18,24,30,36,42,48]),v=pickr([3,4,5,6,7]);const I=`${n} pumpar fyller ${v} m³ på ${t} min`,II=`${2*n} pumpar fyller ${2*v} m³ på ${t} min`;return{...kva(I,II,v/t,2*v/t),q:kvaBody(I,II,"jämför sammanlagt flöde i m³/min")}}
  ],
  "Bråk – gemensam nämnare":[
-  ()=>{let a,b,c,d,n;do{a=rint(1,4);b=rint(1,3);c=rint(3,8);d=rint(1,8);n=27*a-9*b+3*c-d}while(n<10||n>70);const vals=shuffled([n,n+1,n-1,n+3]);return{q:`${brak(a,3)} − ${brak(b,9)} + ${brak(c,27)} − ${brak(d,81)}<br><span class="small muted">Räkna med gemensam nämnare 81</span>`,opts:vals.map(v=>brak(v,81)),ci:vals.indexOf(n)}}
+  ()=>{const fam=pickr([[2,4,8,8],[2,3,6,6],[3,4,12,12],[2,5,10,10],[4,5,20,20],[3,6,18,18],[3,9,27,81],[4,6,12,12]]);let ns,num,tries=0;do{ns=fam.map(d=>rint(1,d-1));num=ns[0]*(fam[3]/fam[0])-ns[1]*(fam[3]/fam[1])+ns[2]*(fam[3]/fam[2])-ns[3];tries++}while(num<=0&&tries<80);if(num<=0){ns=[1,1,1,1];num=fam[3]/fam[0]-fam[3]/fam[1]+fam[3]/fam[2]-1}const q=`${brak(ns[0],fam[0])} − ${brak(ns[1],fam[1])} + ${brak(ns[2],fam[2])} − ${brak(ns[3],fam[3])}<br><span class="small muted">Räkna med minsta gemensamma nämnaren</span>`;return fractionMC(q,num,fam[3])},
+  ()=>{const fam=pickr([[2,4,4],[3,4,12],[2,5,10],[3,6,6],[4,5,20],[3,9,9]]),a=rint(1,fam[0]-1),b=rint(1,fam[1]-1);let sign=pickr([1,-1]),num=a*(fam[2]/fam[0])+sign*b*(fam[2]/fam[1]);if(num<=0){sign=1;num=a*(fam[2]/fam[0])+b*(fam[2]/fam[1])}const q=`${brak(a,fam[0])} ${sign>0?"+":"−"} ${brak(b,fam[1])}<br><span class="small muted">Räkna med minsta gemensamma nämnaren ${fam[2]}</span>`;return fractionMC(q,num,fam[2])}
  ],
  "Likbent triangel och cirkel":[
   ()=>{const area=pickr([18,32,50,72,98]),side=Math.sqrt(2*area);return{q:`En likbent rätvinklig triangel har area ${area} cm². En cirkel har centrum mitt på hypotenusan och tangerar båda kateterna.<br><span class="small muted">Bestäm cirkelns omkrets i π cm</span>`,a:side,unit:"π cm"}},

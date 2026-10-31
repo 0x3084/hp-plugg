@@ -409,11 +409,28 @@ function mc(o){
   for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
   return {q:o.q,opts:arr.map(v=>comma(v)+unit),ci:arr.indexOf(a)};
 }
-const qLabel=q=>q.replace(/<svg[\s\S]*?<\/svg>/g,"[figur] ").replace(/<br>/g," ").replace(/<span class="small muted">[\s\S]*?<\/span>/g,"").replace(/<span>[\s\S]*?<\/span>/g,"").trim();
+const qLabel=q=>q.replace(/<svg[\s\S]*?<\/svg>/g,"[figur] ").replace(/<span class="rule">([\s\S]*?)<\/span>/g," $1").replace(/<br>/g," ").replace(/<span class="small muted">[\s\S]*?<\/span>/g,"").replace(/<span>[\s\S]*?<\/span>/g,"").trim();
 const KVAOPTS=["I är störst","II är störst","I och II är lika stora","Går inte att avgöra"];
 const kvaBody=(I,II,note)=>`<div class="kva"><div><span class="kl">I</span><span>${I}</span></div><div><span class="kl">II</span><span>${II}</span></div></div><span>${note||"jämför storhet I och II"}</span>`;
 const kva=(I,II,v1,v2)=>({q:kvaBody(I,II),opts:KVAOPTS.slice(),ci:v1>v2?0:v1<v2?1:2});
 const kvaD=(I,II,note)=>({q:kvaBody(I,II,note),opts:KVAOPTS.slice(),ci:3});
+const shuffled=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
+const angleSvg=(kind,a,b="x")=>{
+  if(kind==="cross")return `<svg viewBox="0 0 180 120"><line x1="25" y1="100" x2="145" y2="20" stroke="currentColor" stroke-width="2"/><line x1="25" y1="20" x2="145" y2="100" stroke="currentColor" stroke-width="2"/><text x="88" y="38">${a}°</text><text x="82" y="96">${b}°</text></svg>`;
+  if(kind==="alternate"||kind==="sameSide"||kind==="corresponding"){
+    const p=kind==="corresponding"?[[62,25],[123,100]]:kind==="sameSide"?[[62,49],[123,96]]:[[145,96],[62,49]];
+    return `<svg viewBox="0 0 220 145"><line x1="12" y1="35" x2="208" y2="35" stroke="currentColor" stroke-width="2"/><line x1="12" y1="110" x2="208" y2="110" stroke="currentColor" stroke-width="2"/><line x1="58" y1="8" x2="160" y2="137" stroke="currentColor" stroke-width="2"/><text x="114" y="29">L₁</text><text x="18" y="128">L₂</text><text x="${p[0][0]}" y="${p[0][1]}">${a}°</text><text x="${p[1][0]}" y="${p[1][1]}">${b}°</text></svg>`;
+  }
+  if(kind==="triangle")return `<svg viewBox="0 0 200 130"><polygon points="20,110 180,110 105,15" fill="none" stroke="currentColor" stroke-width="2"/><text x="34" y="102">${a}°</text><text x="86" y="40">${b}°</text><text x="148" y="102">x°</text></svg>`;
+  if(kind==="isosceles")return `<svg viewBox="0 0 200 130"><polygon points="100,12 28,112 172,112" fill="none" stroke="currentColor" stroke-width="2"/><path d="M61,62 l8,4 M131,66 l8,-4" stroke="currentColor" stroke-width="2"/><text x="88" y="38">${a}°</text><text x="35" y="105">x°</text><text x="150" y="105">x°</text></svg>`;
+  if(kind==="right"){
+    const rad=a*Math.PI/180,ex=Math.round(30+100*Math.cos(rad)),ey=Math.round(78-100*Math.sin(rad));
+    return `<svg viewBox="0 0 180 105"><line x1="30" y1="78" x2="158" y2="78" stroke="currentColor" stroke-width="2"/><line x1="30" y1="78" x2="30" y2="14" stroke="currentColor" stroke-width="2"/><line x1="30" y1="78" x2="${ex}" y2="${ey}" stroke="currentColor" stroke-width="2"/><path d="M30,62 h16 v16" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="${Math.round(30+ex)/2}" y="70">${a}°</text><text x="34" y="48">x°</text></svg>`;
+  }
+  const theta=(a>90?180-a:a)*Math.PI/180,ex=Math.round(90+70*Math.cos(theta)),ey=Math.round(75-70*Math.sin(theta));
+  const gx=a<=90?112:48,xx=a<=90?48:124;
+  return `<svg viewBox="0 0 180 105"><line x1="12" y1="75" x2="168" y2="75" stroke="currentColor" stroke-width="2"/><line x1="90" y1="75" x2="${ex}" y2="${ey}" stroke="currentColor" stroke-width="2"/><text x="${gx}" y="64">${a}°</text><text x="${xx}" y="64">x°</text></svg>`;
+};
 const TOPICS={
  "Potenser":[
   ()=>{const a=rint(2,9),b=rint(-4,6),c=rint(-3,5);return{q:`2<sup>${sgn(a)}</sup> · 2<sup>${sgn(b)}</sup> / 2<sup>${sgn(c)}</sup> = 2<sup>?</sup><br><span class="small muted">svara med exponenten</span>`,a:a+b-c}},
@@ -501,6 +518,46 @@ const TOPICS={
   ()=>{const a=rint(3,9),k=rint(2,10),v2=k*a;return kva(`${a}²`,`${v2}`,a*a,v2)},
   ()=>kvaD(`x + 6`,`2x`,"x är ett positivt heltal"),
   ()=>kvaD(`x²`,`x`,"x är ett tal")
+ ],
+ "Vinklar – alla regler":[
+  ()=>{const g=rint(35,145);return{q:`${angleSvg("cross",g)}<span class="rule">Vertikalvinklar: mittemot varandra i samma korsning</span><br>x = ?`,a:g,unit:"°"}},
+  ()=>{const g=rint(35,145);return{q:`${angleSvg("alternate",g)}<span class="rule">Alternatvinklar: Z-form mellan parallella linjer</span><br>x = ?`,a:g,unit:"°"}},
+  ()=>{const g=rint(35,145);return{q:`${angleSvg("corresponding",g)}<span class="rule">Likbelägna vinklar: F-form, L₁ ∥ L₂</span><br>x = ?`,a:g,unit:"°"}},
+  ()=>{const g=rint(35,145);return{q:`${angleSvg("sameSide",g)}<span class="rule">Inre vinklar på samma sida: C-form, L₁ ∥ L₂</span><br>x = ?`,a:180-g,unit:"°"}},
+  ()=>{const g=rint(35,145);return{q:`${angleSvg("line",g)}<span class="rule">Sidovinklar på en rak linje (supplementvinklar)</span><br>x = ?`,a:180-g,unit:"°"}},
+  ()=>{const g=rint(20,70);return{q:`${angleSvg("right",g)}<span class="rule">Komplementvinklar: tillsammans en rät vinkel</span><br>x = ?`,a:90-g,unit:"°"}},
+  ()=>{const a=rint(55,145),b=rint(45,Math.min(150,315-a)),x=360-a-b;return{q:`En punkt omges av tre vinklar: ${a}°, ${b}° och x°.<br><span class="small muted">Vinklar runt en punkt</span>`,a:x,unit:"°"}},
+  ()=>{const a=rint(35,75),b=rint(35,Math.min(75,140-a)),x=180-a-b;return{q:`${angleSvg("triangle",a,b)}<span class="rule">Triangelns vinkelsumma</span><br>x = ?`,a:x,unit:"°"}},
+  ()=>{const a=rint(35,75),b=rint(35,75),x=a+b;return{q:`En triangel har två motstående inre vinklar ${a}° och ${b}°. Yttervinkeln är x°.<br><span class="rule">Triangelns yttervinkel</span>`,a:x,unit:"°"}},
+  ()=>{const apex=2*rint(20,60),base=(180-apex)/2;return{q:`${angleSvg("isosceles",apex)}<span class="rule">Likbent triangel: basvinklarna är lika</span><br>x = ?`,a:base,unit:"°"}}
+ ],
+ "Koordinater och avstånd":[
+  ()=>{const p=pickr([[3,4,5],[5,12,13],[8,15,17],[7,24,25]]),dx=p[0],dy=p[1];return{q:`Avståndet mellan (0, 0) och (${dx}, ${dy})`,a:p[2]}},
+  ()=>{const x=rint(-5,5),y=rint(-5,5),d=pickr([3,4,5]);return{q:`Avståndet mellan (${x}, ${y}) och (${x+d}, ${y})`,a:d}},
+  ()=>{const x=rint(-5,5),y=rint(-5,5),d=pickr([3,4,5]);return{q:`Avståndet mellan (${x}, ${y}) och (${x}, ${y-d})`,a:d}},
+  ()=>{const dy1=pickr([2,3,4]),dy2=pickr([5,6,8]);return kva(`Avståndet (1, 2) till (2, ${2+dy1})`,`Avståndet (1, 2) till (2, ${2-dy2})`,Math.sqrt(1+dy1*dy1),Math.sqrt(1+dy2*dy2))},
+  ()=>{const p=pickr([[3,4,5],[5,12,13],[8,15,17]]),sign=pickr([-1,1]);return{q:`Avståndet mellan (${rint(-4,4)}, ${rint(-4,4)}) och en punkt som ligger ${p[0]} steg åt sidan och ${p[1]} steg ${sign>0?"upp":"ned"}`,a:p[2]}},
+  ()=>{const p=pickr([[3,4,5],[5,12,13],[8,15,17]]),q=pickr([[3,4,5],[5,12,13],[8,15,17]]);return kva(`Avståndet (0, 0) till (${p[0]}, ${p[1]})`,`Avståndet (0, 0) till (${q[0]}, ${q[1]})`,p[2],q[2])}
+ ],
+ "Tal och delbarhet":[
+  ()=>{const opts=shuffled(["3","9","11","10"]);return{q:`Två tal har samma två siffror i omvänd ordning: x = 10a + b och y = 10b + a.<br><span class="small muted">Vilket tal delar alltid x + y?</span>`,opts,ci:opts.indexOf("11")}},
+  ()=>{const opts=shuffled(["2","3","9","11"]);return{q:`Två tal har samma två siffror i omvänd ordning: x = 10a + b och y = 10b + a.<br><span class="small muted">Vilket tal delar alltid x − y?</span>`,opts,ci:opts.indexOf("9")}},
+  ()=>{const a=rint(1,8),b=rint(1,9),opts=shuffled(["5","9","11","10"]);return{q:`Talet ${10*a+b} och talet ${10*b+a} har samma siffror i omvänd ordning.<br><span class="small muted">Summan är alltid delbar med vilket tal?</span>`,opts,ci:opts.indexOf("11")}},
+  ()=>{const a=rint(1,8),b=rint(1,9),correct=`11(${a}+${b})`,opts=shuffled([correct,`9(${a}+${b})`,`10(${a}+${b})`,`11(${a}-${b})`]);return{q:`Skriv talen ${10*a+b} och ${10*b+a} som ${10*a+b} = 10·${a} + ${b} och ${10*b+a} = 10·${b} + ${a}.<br><span class="small muted">Vilket uttryck blir summan?</span>`,opts,ci:opts.indexOf(correct)}}
+ ],
+ "Flöde och pumpar":[
+  ()=>{const pumps=pickr([4,6,8,10,12,14]),mins=pickr([18,24,30,36,42,48]),volume=pickr([3,4,5,6,7,8]);const pumpFactor=3,volFactor=2;return{q:`${pumps} pumpar fyller ${volume} m³ på ${mins} minuter.<br><span class="small muted">Hur lång tid tar ${pumps*pumpFactor} pumpar att fylla ${volume*volFactor} m³?</span>`,a:mins*volFactor/pumpFactor,unit:" min"}},
+  ()=>{const pumps=pickr([4,6,8,10,12,14]),mins=pickr([20,30,40]),volume=pickr([2,3,4,5,6,7]),time=mins*3,opts=KVAOPTS.slice();return{q:kvaBody(`Tiden för ${pumps*3} pumpar att fylla ${volume*9} m³`,`90 minuter`,`Utgångsläge: ${pumps} pumpar fyller ${volume} m³ på ${mins} minuter.`),opts,ci:time>90?0:time<90?1:2}},
+  ()=>{const pumps=pickr([3,4,5,6,8,10]),vol=pickr([2,3,4,5,6]),mins=pickr([10,15,20,30]);return{q:`${pumps} likadana pumpar fyller ${vol} m³ på ${mins} minuter.<br><span class="small muted">Hur många m³ fyller de på ${mins*2} minuter?</span>`,a:vol*2,unit:" m³"}},
+  ()=>{const n=pickr([4,6,8,10,12]),t=pickr([15,20,30,40]),v=pickr([2,3,4,5]);return{q:`${n} pumpar fyller ${v} m³ på ${t} minuter.<br><span class="small muted">Vilket är pumparnas sammanlagda flöde i m³/min?</span>`,a:v/t}}
+ ],
+ "Bråk – gemensam nämnare":[
+  ()=>{let a,b,c,d,n;do{a=rint(1,4);b=rint(1,3);c=rint(3,8);d=rint(1,8);n=27*a-9*b+3*c-d}while(n<10||n>70);const vals=shuffled([n,n+1,n-1,n+3]);return{q:`${brak(a,3)} − ${brak(b,9)} + ${brak(c,27)} − ${brak(d,81)}<br><span class="small muted">Räkna med gemensam nämnare 81</span>`,opts:vals.map(v=>brak(v,81)),ci:vals.indexOf(n)}}
+ ],
+ "Likbent triangel och cirkel":[
+  ()=>{const area=pickr([18,32,50,72,98]),side=Math.sqrt(2*area);return{q:`En likbent rätvinklig triangel har area ${area} cm². En cirkel har centrum mitt på hypotenusan och tangerar båda kateterna.<br><span class="small muted">Bestäm cirkelns omkrets i π cm</span>`,a:side,unit:"π cm"}},
+  ()=>{const side=pickr([6,8,10,12,14]);return{q:`En likbent rätvinklig triangel har kateterna ${side} cm. Cirkelns centrum ligger mitt på hypotenusan och cirkeln tangerar båda kateterna.<br><span class="small muted">Vad är cirkelns radie?</span>`,a:side/2,unit:" cm"}},
+  ()=>{const side=pickr([6,8,10,12,14]);return{q:`En likbent rätvinklig triangel har kateterna ${side} cm. En cirkel tangerar båda kateterna och har centrum mitt på hypotenusan.<br><span class="small muted">Vad är cirkelns diameter?</span>`,a:side,unit:" cm"}}
  ]
 };
 let drill=null;
@@ -765,9 +822,12 @@ function vPlan(){
 function drillHtml(){
   const b=S.drill.best;
   if(!drill){
-    const btns=Object.keys(TOPICS).map(t=>`<button class="btn sm ghost" data-topic="${t}" style="flex:0 0 auto">${t}</button>`).join("");
-    return `<p>Uppgifter i provets stil med svarsalternativ A–D, precis som på riktiga provet. Välj ett område eller kör tio blandade.</p>
-    <div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${btns}</div>
+    const focusTopics=["Vinklar – alla regler","Koordinater och avstånd","Tal och delbarhet","Flöde och pumpar","Bråk – gemensam nämnare","Likbent triangel och cirkel"];
+    const topicButtons=topics=>topics.map(t=>`<button class="btn sm ghost" data-topic="${t}" style="flex:0 0 auto">${t}</button>`).join("");
+    const btns=topicButtons(Object.keys(TOPICS).filter(t=>!focusTopics.includes(t)));
+    return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
+    <h3 style="margin-top:16px">Öva på det du fastnade på</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(focusTopics)}</div>
+    <h3 style="margin-top:16px">Övriga matteområden</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${btns}</div>
     <p class="small muted">${S.drill.rounds?`${S.drill.rounds} omgångar gjorda. Bästa blandade: ${b?`${b.score}/10 på ${b.sec} s`:"–"}.`:"Ingen omgång gjord än."}</p>
     <button class="btn pencil" id="drillStart">Starta 10 blandade</button>`;
   }
@@ -882,7 +942,7 @@ document.getElementById("app").addEventListener("click",e=>{
     STARTWORDS.forEach(([w,m])=>{if(!have.has(w.toLowerCase())){S.cards.push({id:uid(),w,m,box:0,due:today()});have.add(w.toLowerCase());n++}});
     S.pack=true;save();render();toast(n?n+" ord tillagda – "+(S.settings.perDay||20)+" nya per dag":"Alla ord finns redan")}
   else if(el.id==="drillStart"){const pool=Object.entries(TOPICS).filter(([k])=>!/KVA/.test(k)).flatMap(([,v])=>v);drill={qs:Array.from({length:10},()=>mc(pickr(pool)())),i:0,start:Date.now(),res:[]};render()}
-  else if(ds.topic){drill={qs:Array.from({length:10},()=>mc(pickr(TOPICS[ds.topic])())),i:0,start:Date.now(),res:[],topic:ds.topic};render()}
+  else if(ds.topic){const fs=ds.topic==="Vinklar – alla regler"?shuffled(TOPICS[ds.topic]):Array.from({length:10},()=>pickr(TOPICS[ds.topic]));drill={qs:fs.map(f=>mc(f())),i:0,start:Date.now(),res:[],topic:ds.topic};render()}
   else if(ds.opt!==undefined&&drill&&drill.i<drill.qs.length){const q=drill.qs[drill.i],gi=+ds.opt;
     drill.res.push({q:q.q,opts:q.opts,ci:q.ci,gi,ok:gi===q.ci});drill.i++;
     if(drill.i>=drill.qs.length){drill.sec=Math.round((Date.now()-drill.start)/1000);const sc=drill.res.filter(r=>r.ok).length;

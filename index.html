@@ -824,7 +824,7 @@ function vIdag(){
     const st=tm(b.s),en=tm(b.e),cls=nowM>=en?"done":(nowM>=st&&nowM<en?"now":"");
     h+=`<li class="blk ${cls}"><div class="t">${b.s}–${b.e} <span class="muted small">${hm(b.m)}</span></div><div class="d">${esc(b.d)}</div><div class="chips">`;
     b.o.forEach(k=>{h+=`<button class="chip ${SUBJ[k].v?"v":"k"}" data-start="${k}" data-min="${b.m}" title="${SUBJ[k].n}">${SUBJ[k].l}</button>`});
-    h+=`</div>${b.o.includes("LAS")?`<button class="btn sm pencil" data-reading-start style="margin:8px 0 2px">Välj en LÄS-text och starta</button>`:""}${guideHtml(b)}</li>`;
+    h+=`</div>${b.o.includes("LAS")?`<button class="btn sm pencil" data-reading-start style="margin:8px 0 2px">Välj en LÄS-text och starta</button>`:""}${b.o.some(k=>KV.includes(k))?`<button class="btn sm pencil" data-math-start style="margin:8px 0 2px">Välj matteuppgifter åt mig</button>`:""}${guideHtml(b)}</li>`;
   });
   h+=`</ul>`;
   h+=`<h2>Logga tid i efterhand</h2><div class="row">
@@ -966,6 +966,7 @@ function drillHtml(){
     const btns=topicButtons(Object.keys(TOPICS).filter(t=>!focusTopics.includes(t)&&!examTypes.includes(t)));
     return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Frågor märkta med källa är riktiga uppgifter från dina prov, återgivna i originalets provlayout. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
     <h3 style="margin-top:16px">LÄS – välj en text åt mig</h3><p class="small muted">Appen väljer en av tre övningstexter och ger fyra frågor. Svara först utan ledtrådar; efteråt får du facit med meningen som stödjer svaret.</p><button class="btn pencil" data-reading-start>Starta ett LÄS-pass</button>
+    <h3 style="margin-top:16px">Matte – välj frågor åt mig</h3><p class="small muted">Appen sätter ihop tio olika originalfrågor ur dina prov, från flera matteområden. Den tar med en fråga om rötter och en om bråk när sådana finns i banken.</p><button class="btn pencil" data-math-start>Starta ett blandat mattepass</button>
     <h3 style="margin-top:16px">Öva på det du fastnade på</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(focusTopics)}</div>
     <h3 style="margin-top:16px">Provtyper – NOG och DTK</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(examTypes)}</div>
     <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">${HP_BANK.length.toLocaleString("sv-SE")} originalfrågor från de sökbara proven 2000–2026, sorterade efter matteområde och provdel (XYZ, KVA, NOG och DTK). Välj en kategori för att träna bara provfrågor. Frågor från äldre skannade PDF-filer är ännu inte importerade.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
@@ -984,7 +985,7 @@ function drillHtml(){
     <div class="exam-controls"><button class="btn sm ghost" id="drillQuit">Avbryt</button></div></section>`;
   }
   const sc=drill.res.filter(r=>r.ok).length,wr=drill.res.filter(r=>!r.ok),n=drill.qs.length;
-  const again=drill.passage?`<button class="btn pencil" data-reading-start style="flex:0 0 auto">Välj en ny text</button>`:drill.hpOnly?`<button class="btn pencil" data-hp-topic="${drill.hpTopic}" style="flex:0 0 auto">Träna originalfrågorna igen</button>`:drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
+  const again=drill.passage?`<button class="btn pencil" data-reading-start style="flex:0 0 auto">Välj en ny text</button>`:drill.mathMix?`<button class="btn pencil" data-math-start style="flex:0 0 auto">Nytt blandat mattepass</button>`:drill.hpOnly?`<button class="btn pencil" data-hp-topic="${drill.hpTopic}" style="flex:0 0 auto">Träna originalfrågorna igen</button>`:drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
   return `<div class="flash"><div class="w">${sc}/${n}</div><div>${drill.passage?`LÄS · ${esc(drill.passage.title)}`:`på ${drill.sec} sekunder${drill.topic?` · ${drill.topic}`:""}`}</div>
     ${drill.passage?`<div style="text-align:left;margin-top:16px">${drill.res.map((r,i)=>`<div class="reading-feedback"><b>${i+1}. ${r.ok?"Rätt":"Gå tillbaka till texten"} · ${L[r.ci]}: ${esc(r.opts[r.ci])}</b><div class="small" style="margin-top:5px">Textstöd: ”${esc(r.proof)}”</div></div>`).join("")}</div>`:""}
     ${drill.passage?"":wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.source||qLabel(r.q)}: <span class="wrong">${L[r.gi]}</span> → <span class="right">${r.imageChoices?L[r.ci]:`${L[r.ci]} ${r.opts[r.ci]}`}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
@@ -1055,6 +1056,7 @@ document.getElementById("tcancel").onclick=()=>{S.timer=null;save();render()};
 document.getElementById("app").addEventListener("click",e=>{
   const el=e.target.closest("button,input");if(!el)return;const ds=el.dataset;
   if(ds.readingStart!==undefined){const set=pickr(LAS_PRACTICE);drill={qs:set.qs.map(q=>({q:q.q,opts:q.opts,ci:q.ci,proof:q.proof})),i:0,start:Date.now(),res:[],topic:"LÄS",passage:set};go("material")}
+  else if(ds.mathStart!==undefined){const pool=shuffled(HP_BANK),chosen=[];for(const must of ["Rötter","Bråk och decimaler"]){const q=pickr(pool.filter(x=>x.topic===must));if(q){chosen.push(q);pool.splice(pool.indexOf(q),1)}}const groups={};for(const q of pool)if(!groups[q.topic])groups[q.topic]=q;chosen.push(...shuffled(Object.values(groups)).slice(0,10-chosen.length));drill={qs:shuffled(chosen).map(q=>hpOriginal(q.img,q.source,q.letter,q.opts)),i:0,start:Date.now(),res:[],topic:"Kvant · blandat",mathMix:true};go("material")}
   else if(ds.start){
     if(S.timer){toast("Spara eller avbryt pågående pass först");return}
     ensureAudio();S.timer={subj:ds.start,start:Date.now(),plan:+ds.min};save();render();toast("Timer startad");

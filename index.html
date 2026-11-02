@@ -148,7 +148,7 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .exam-prompt .drillq .hp-qimg{display:block;width:min(100%,650px);height:auto;margin:4px auto 8px;background:#fff}
 .exam-prompt .drillq .hp-source{display:block;margin:4px 0 0;color:#697386;font:400 .8rem/1.4 var(--font-b);text-align:right}
 .exam-head.source-question{display:block}
-.exam-sheet .answer-bubbles{display:flex;justify-content:flex-start;gap:10px;margin:14px 0 14px 38px}
+.exam-sheet .answer-bubbles{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:10px;margin:14px 0 14px 38px}
 .exam-sheet .answer-bubble{width:44px;height:44px;flex:0 0 44px;border:1.5px solid #b9bdc6;border-radius:50%;background:#fff;color:#202124;font:700 1rem var(--font-b);cursor:pointer}
 .exam-sheet .answer-bubble:hover{background:#f1f2f4;border-color:#202124}
 .exam-prompt .drillq svg{width:min(480px,100%);margin:12px 0 14px;padding:0;background:#fff;border-radius:0}
@@ -613,9 +613,35 @@ const TOPICS={
   ()=>{const side=pickr([6,8,10,12,14]);return{q:`En likbent rätvinklig triangel har kateterna ${side} cm. En cirkel tangerar båda kateterna och har centrum mitt på hypotenusan.<br><span class="small muted">Vad är cirkelns diameter?</span>`,a:side,unit:" cm"}}
  ]
 };
-const hpOriginal=(img,source,letter)=>{const key=`HP ${source}`;return{q:`<img class="hp-qimg" src="./provsfragor/${img}" alt="${key}, svarsalternativ i bilden"><span class="hp-source">${key}</span>`,opts:["A","B","C","D"],ci:["A","B","C","D"].indexOf(letter),imageChoices:true,source:key}};
+const hpOriginal=(img,source,letter,labels=["A","B","C","D"])=>{const key=`HP ${source}`;return{q:`<img class="hp-qimg" src="./provsfragor/${img}" alt="${key}, svarsalternativ i bilden"><span class="hp-source">${key}</span>`,opts:labels,ci:labels.indexOf(letter),imageChoices:true,source:key}};
 const HP_BANK=[["Geometri","2024-var-pass-2/xyz-01.png","2024 vår · XYZ, fråga 1","B"],["Algebra","2024-var-pass-2/xyz-02.png","2024 vår · XYZ, fråga 2","D"],["Algebra","2024-var-pass-2/xyz-03.png","2024 vår · XYZ, fråga 3","D"],["Procent","2024-var-pass-2/xyz-04.png","2024 vår · XYZ, fråga 4","B"],["Algebra","2024-var-pass-2/xyz-05.png","2024 vår · XYZ, fråga 5","A"],["Geometri","2024-var-pass-2/xyz-06.png","2024 vår · XYZ, fråga 6","B"],["Koordinater och avstånd","2024-var-pass-2/xyz-07.png","2024 vår · XYZ, fråga 7","C"],["Geometri","2024-var-pass-2/xyz-08.png","2024 vår · XYZ, fråga 8","D"],["Algebra","2024-var-pass-2/xyz-09.png","2024 vår · XYZ, fråga 9","A"],["Tal och delbarhet","2024-var-pass-2/xyz-10.png","2024 vår · XYZ, fråga 10","C"],["Statistik och sannolikhet","2024-var-pass-2/xyz-11.png","2024 vår · XYZ, fråga 11","D"],["Potenser","2024-var-pass-2/xyz-12.png","2024 vår · XYZ, fråga 12","B"],["Flöde och pumpar","2018-host/kvant-pass-4-kva-22.png","2018 höst · KVA, fråga 22","B"],["Rötter","2026-var/kvant-pass-3-xyz-12.png","2026 vår · XYZ, fråga 12","C"],["Geometri","2026-var/kvant-pass-3-xyz-11.png","2026 vår · XYZ, fråga 11","D"],["Bråk och decimaler","2026-host/kvant-pass-1-xyz-11.png","2026 höst · XYZ, fråga 11","B"]].map(([topic,img,source,letter])=>({topic,img,source,letter}));
 HP_BANK.forEach(x=>TOPICS[x.topic].push(()=>hpOriginal(x.img,x.source,x.letter)));
+HP_BANK.push(
+ {topic:"Kvantitativa resonemang (NOG)",img:"2000-var/2000vt-nog-01.png",source:"2000 vår · NOG, fråga 1",letter:"C",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2001-host/2001ht-nog-01.png",source:"2001 höst · NOG, fråga 1",letter:"C",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2002-var/2002vt-nog-01.png",source:"2002 vår · NOG, fråga 1",letter:"E",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2003-var/2003vt-nog-01.png",source:"2003 vår · NOG, fråga 1",letter:"D",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2004-var/2004vt-nog-01.png",source:"2004 vår · NOG, fråga 1",letter:"B",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2005-var/2005vt-nog-01.png",source:"2005 vår · NOG, fråga 1",letter:"C",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2006-var/2006vt-nog-01.png",source:"2006 vår · NOG, fråga 1",letter:"D",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2007-var/2007vt-nog-01.png",source:"2007 vår · NOG, fråga 1",letter:"B",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2008-var/2008vt-nog-01.png",source:"2008 vår · NOG, fråga 1",letter:"E",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2009-var/2009vt-nog-01.png",source:"2009 vår · NOG, fråga 1",letter:"E",opts:["A","B","C","D","E"]},
+ {topic:"Kvantitativa resonemang (NOG)",img:"2010-var/2010vt-nog-01.png",source:"2010 vår · NOG, fråga 1",letter:"C",opts:["A","B","C","D","E"]},
+ {topic:"Algebra",img:"2011-host/2011ht-xyz-01.png",source:"2011 höst · XYZ, fråga 1",letter:"B"},
+ {topic:"Tal och delbarhet",img:"2012-host/2012ht-xyz-01.png",source:"2012 höst · XYZ, fråga 1",letter:"C"},
+ {topic:"Bråk och decimaler",img:"2013-host/2013ht-xyz-01.png",source:"2013 höst · XYZ, fråga 1",letter:"B"},
+ {topic:"Algebra",img:"2014-host/2014ht-xyz-01.png",source:"2014 höst · XYZ, fråga 1",letter:"B"},
+ {topic:"Bråk och decimaler",img:"2015-host/2015ht-xyz-01.png",source:"2015 höst · XYZ, fråga 1",letter:"B"},
+ {topic:"Algebra",img:"2016-host/2016ht-xyz-01.png",source:"2016 höst · XYZ, fråga 1",letter:"A"},
+ {topic:"Tal och delbarhet",img:"2017-host/2017ht-xyz-01.png",source:"2017 höst · XYZ, fråga 1",letter:"C"},
+ {topic:"Potenser",img:"2019-host/2019ht-xyz-01.png",source:"2019 höst · XYZ, fråga 1",letter:"A"},
+ {topic:"Algebra",img:"2020-host/2020ht-xyz-01.png",source:"2020 höst · XYZ, fråga 1",letter:"C"},
+ {topic:"Bråk och decimaler",img:"2021-host/2021ht-xyz-01.png",source:"2021 höst · XYZ, fråga 1",letter:"A"},
+ {topic:"Algebra",img:"2022-host/2022ht-xyz-01.png",source:"2022 höst · XYZ, fråga 1",letter:"C"},
+ {topic:"Bråk och decimaler",img:"2023-host/2023ht-xyz-01.png",source:"2023 höst · XYZ, fråga 1",letter:"C"},
+ {topic:"Bråk och decimaler",img:"2025-host/2025ht-xyz-01.png",source:"2025 höst · XYZ, fråga 1",letter:"B"}
+);
 let drill=null;
 function focusDrill(){const i=document.getElementById("drillIn");if(i)i.focus()}
 
@@ -887,7 +913,7 @@ function drillHtml(){
     return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Frågor märkta med källa är riktiga uppgifter från dina prov, återgivna i originalets provlayout. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
     <h3 style="margin-top:16px">Öva på det du fastnade på</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(focusTopics)}</div>
     <h3 style="margin-top:16px">Provtyper – NOG och DTK</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(examTypes)}</div>
-    <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">Välj ett ämne för att träna enbart originalfrågor. De visas som bilder från provhäftet med källa; välj A–D under bilden.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
+    <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">${HP_BANK.length} originalfrågor från 2000–2026, sorterade efter matteområde eller NOG. Välj en kategori för att träna bara provfrågor. De visas i provens originalformat med källa och facit.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
     <h3 style="margin-top:16px">Övriga matteområden</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${btns}</div>
     <p class="small muted">${S.drill.rounds?`${S.drill.rounds} omgångar gjorda. Bästa blandade: ${b?`${b.score}/10 på ${b.sec} s`:"–"}.`:"Ingen omgång gjord än."}</p>
     <button class="btn pencil" id="drillStart">Starta 10 blandade</button>`;
@@ -1003,7 +1029,7 @@ document.getElementById("app").addEventListener("click",e=>{
     STARTWORDS.forEach(([w,m])=>{if(!have.has(w.toLowerCase())){S.cards.push({id:uid(),w,m,box:0,due:today()});have.add(w.toLowerCase());n++}});
     S.pack=true;save();render();toast(n?n+" ord tillagda – "+(S.settings.perDay||20)+" nya per dag":"Alla ord finns redan")}
   else if(el.id==="drillStart"){const pool=Object.entries(TOPICS).filter(([k])=>!/KVA/.test(k)).flatMap(([,v])=>v);drill={qs:Array.from({length:10},()=>mc(pickr(pool)())),i:0,start:Date.now(),res:[]};render()}
-  else if(ds.hpTopic){const qs=HP_BANK.filter(q=>q.topic===ds.hpTopic).map(q=>hpOriginal(q.img,q.source,q.letter));drill={qs,i:0,start:Date.now(),res:[],topic:ds.hpTopic,hpTopic:ds.hpTopic,hpOnly:true};render()}
+  else if(ds.hpTopic){const qs=HP_BANK.filter(q=>q.topic===ds.hpTopic).map(q=>hpOriginal(q.img,q.source,q.letter,q.opts));drill={qs,i:0,start:Date.now(),res:[],topic:ds.hpTopic,hpTopic:ds.hpTopic,hpOnly:true};render()}
   else if(ds.topic){const fs=ds.topic==="Vinklar – alla regler"?shuffled(TOPICS[ds.topic]):Array.from({length:10},()=>pickr(TOPICS[ds.topic]));drill={qs:fs.map(f=>mc(f())),i:0,start:Date.now(),res:[],topic:ds.topic};render()}
   else if(ds.opt!==undefined&&drill&&drill.i<drill.qs.length){const q=drill.qs[drill.i],gi=+ds.opt;
     drill.res.push({q:q.q,opts:q.opts,ci:q.ci,gi,ok:gi===q.ci,source:q.source,imageChoices:q.imageChoices});drill.i++;

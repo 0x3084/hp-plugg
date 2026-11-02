@@ -162,6 +162,9 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .exam-sheet .opt .frac .num{border-bottom:1.5px solid currentColor;padding:0 5px 2px}
 .exam-sheet .opt .frac .den{padding:2px 5px 0}
 .exam-sheet .exam-controls{margin:10px 0 0 38px}
+.reading-passage{margin:0 0 20px;padding:18px 20px;background:#fff;color:#202124;border:1px solid #d9d9d9;border-radius:8px;font:1rem/1.7 Arial,Helvetica,sans-serif;white-space:pre-line}
+.reading-passage h3{margin:0 0 10px;color:#202124;font:700 1.05rem/1.35 Arial,Helvetica,sans-serif}
+.reading-feedback{margin:8px 0;padding:12px 14px;background:var(--sheet);border-left:4px solid var(--verb);border-radius:6px;text-align:left}
 .boxes{display:flex;gap:6px;margin:10px 0}
 .boxes div{flex:1;background:var(--sheet);border:1.5px solid var(--line);border-radius:8px;padding:6px;text-align:center}
 .boxes b{display:block;font-family:var(--font-h);font-size:1.2rem}
@@ -312,6 +315,43 @@ const MATH = ["Potensregler","Rötter","Bråk","Procent","Algebra"];
 const LEIT = [0,1,3,7,14,30]; // dagar till nästa repetition per låda 1–5 (index = låda)
 const TABS = ["idag","vecka","ord","material","logg","plan"];
 const EXAM_DATE = "2027-04-10";
+
+// Egna LÄS-övningstexter med frågor. Appen väljer en text åt användaren.
+const LAS_PRACTICE = [
+ {title:"När staden blir svalare",text:[
+  "Under varma sommardagar kan skillnaden mellan stadens centrum och landsbygden vara flera grader. Asfalt och mörka tak lagrar värme, medan träd och fuktig jord hjälper omgivningen att svalna. Fenomenet har fått många kommuner att plantera fler träd, men resultaten är inte alltid så enkla som de först verkar.",
+  "Ett träd ger skugga och vatten avdunstar från bladen. Båda processerna kan sänka temperaturen nära marken. Effekten beror dock på var trädet står, hur stort det är och om vinden kan föra bort den varma luften. I en smal gata med höga hus kan en tät trädkrona ibland hindra luftcirkulationen. Därför räcker det inte att räkna antalet planterade träd; man behöver också undersöka hur platsen används.",
+  "Forskare har dessutom pekat på att svalka inte fördelas jämnt. Parker kan vara behagliga för den som bor intill, men ge liten hjälp åt människor i kvarter utan grönområden. Vissa städer testar därför små planteringar, ljusare tak och öppna vattenytor på platser där många rör sig. Åtgärderna konkurrerar ibland om samma utrymme som bostäder, trafik och lekplatser.",
+  "Planering för svalare städer handlar alltså både om växtlighet och om vilka människor som får nytta av den. En genomtänkt lösning kan vara mindre i omfattning än en stor park, men placeras så att den hjälper fler."
+ ].join("\n\n"),qs:[
+  {q:"Vad är textens huvudsakliga budskap?",opts:["Träd är alltid det effektivaste sättet att kyla en stad.","Stadens svalka kräver åtgärder som anpassas efter plats och vilka som ska nås.","Parker bör ersätta trafikleder i stadskärnor.","Forskare är oense om huruvida träd kan ge skugga."],ci:1,proof:"Planering för svalare städer handlar alltså både om växtlighet och om vilka människor som får nytta av den."},
+  {q:"Varför kan en tät trädkrona vara olämplig på en smal gata?",opts:["Den kan minska luftens rörelse.","Den gör taken mörkare.","Den hindrar vatten från att avdunsta.","Den gör att gatan får mer asfalt."],ci:0,proof:"I en smal gata med höga hus kan en tät trädkrona ibland hindra luftcirkulationen."},
+  {q:"Vad menas med att svalka inte fördelas jämnt?",opts:["Alla parker har olika öppettider.","Vissa områden och invånare får mindre nytta av svalkande miljöer.","Träd växer olika snabbt i olika städer.","Vattenytor kyler bara på natten."],ci:1,proof:"Parker kan vara behagliga för den som bor intill, men ge liten hjälp åt människor i kvarter utan grönområden."},
+  {q:"Vilken slutsats stöds bäst av textens sista stycke?",opts:["En stor park är alltid sämre än små planteringar.","Placeringen kan vara lika viktig som åtgärdens storlek.","Bostäder bör alltid prioriteras framför grönområden.","Städer bör sluta mäta temperaturen."],ci:1,proof:"En genomtänkt lösning kan vara mindre i omfattning än en stor park, men placeras så att den hjälper fler."}
+ ]},
+ {title:"Att minnas genom att glömma",text:[
+  "Det kan verka självklart att upprepad läsning är det bästa sättet att lära sig. När en text känns bekant uppstår lätt en känsla av att man kan innehållet. Men igenkänning är inte samma sak som att själv kunna plocka fram kunskapen när boken är stängd.",
+  "I flera studier har elever fått läsa samma material på olika sätt. En grupp läste om texten flera gånger. En annan stängde boken efter läsningen och försökte återge huvudidéerna ur minnet. Den senare gruppen mindes ofta mer vid ett prov några dagar senare, även om återkallandet kändes ansträngande medan det pågick.",
+  "Forskare beskriver detta som en önskvärd svårighet: arbetet känns mindre flytande, men stärker möjligheten att hämta kunskapen senare. Det betyder inte att all repetition är meningslös. Att återvända till materialet efter ett försök att minnas kan hjälpa till att upptäcka luckor och rätta missförstånd.",
+  "Effekten påverkas också av hur långt det är mellan övningarna. Om allt görs under en enda kväll kan kunskapen snabbt blekna. Kortare återbesök utspridda över tid verkar ofta fungera bättre. Den som planerar sin träning behöver därför väga bekvämlighet mot vad som faktiskt fastnar."
+ ].join("\n\n"),qs:[
+  {q:"Vilken skillnad gör texten mellan igenkänning och att minnas?",opts:["Igenkänning kräver mer träning än att minnas.","Att något känns bekant innebär inte nödvändigtvis att man kan återge det själv.","Minnet fungerar bara när en bok är stängd.","Igenkänning sker enbart flera dagar efter läsning."],ci:1,proof:"Men igenkänning är inte samma sak som att själv kunna plocka fram kunskapen när boken är stängd."},
+  {q:"Vad gjorde gruppen som ofta mindes mer vid ett senare prov?",opts:["De läste texten fler gånger.","De skrev av texten ordagrant.","De försökte återge innehållet utan att titta i boken.","De väntade med att läsa tills provdagen."],ci:2,proof:"En annan stängde boken efter läsningen och försökte återge huvudidéerna ur minnet."},
+  {q:"Vad syftar uttrycket ”önskvärd svårighet” på här?",opts:["En uppgift som är omöjlig men motiverande.","En ansträngning som känns svår men kan förbättra senare återkallning.","Att man bör undvika att repetera.","Att prov alltid ska vara svårare än undervisningen."],ci:1,proof:"Arbetet känns mindre flytande, men stärker möjligheten att hämta kunskapen senare."},
+  {q:"Vilket råd ligger närmast textens slutsats?",opts:["Läs om allt material samma kväll.","Byt ut repetition mot en enda minnesövning.","Försök minnas aktivt och återkom till materialet vid flera tillfällen.","Undvik att rätta missförstånd efter övningen."],ci:2,proof:"Kortare återbesök utspridda över tid verkar ofta fungera bättre."}
+ ]},
+ {title:"Vem äger en stads berättelse?",text:[
+  "När en gammal industribyggnad blir museum eller bostäder beskrivs förändringen ofta som en räddning. Byggnaden får nytt liv, samtidigt som en del av stadens historia bevaras. Men renoveringen väcker också frågor om vilken historia som får synas och vem som får berätta den.",
+  "I många industrimiljöer har arbetarnas vardag lämnat färre spår än företagens framgångar. Arkiv innehåller ritningar, bokslut och direktörers brev, medan muntliga minnen sällan har samlats in systematiskt. När en utställning främst bygger på det som redan finns i arkiven riskerar därför vissa perspektiv att dominera, även om ingen medvetet har valt bort andra.",
+  "En del museer försöker bredda materialet genom intervjuer med tidigare anställda och deras familjer. Sådana berättelser kan fylla luckor, men de är inte neutrala ersättningar för skriftliga källor. Människor minns olika, och minnen påverkas av vad som hänt efteråt. Forskare menar därför att flera slags källor bör sättas i relation till varandra.",
+  "Att bevara en byggnad är alltså inte samma sak som att bevara en fullständig historia. Det kräver också beslut om vilka erfarenheter som dokumenteras, hur de tolkas och vilka besökare som känner igen sig i berättelsen."
+ ].join("\n\n"),qs:[
+  {q:"Vilken fråga står i centrum för texten?",opts:["Hur gamla industribyggnader bäst värderas ekonomiskt.","Hur urvalet av källor påverkar berättelsen om en plats.","Varför museer bör undvika intervjuer.","Vilken sorts bostäder som passar i fabriker."],ci:1,proof:"Renoveringen väcker också frågor om vilken historia som får synas och vem som får berätta den."},
+  {q:"Varför kan arbetarnas perspektiv saknas i en utställning?",opts:["De tidigare anställda vill aldrig prata med museer.","Arkiven innehåller ofta fler spår av företagsledningen än av arbetarnas vardag.","Muntliga minnen är alltid opålitliga.","Industribyggnader saknar historiska dokument."],ci:1,proof:"Arkiv innehåller ritningar, bokslut och direktörers brev, medan muntliga minnen sällan har samlats in systematiskt."},
+  {q:"Hur beskriver texten muntliga minnen?",opts:["Som användbara men påverkade av personens perspektiv och senare erfarenheter.","Som mer exakta än alla skriftliga dokument.","Som värdelösa eftersom människor minns olika.","Som neutrala så länge flera personer intervjuas."],ci:0,proof:"Människor minns olika, och minnen påverkas av vad som hänt efteråt."},
+  {q:"Vad innebär textens påstående att bevara en byggnad inte är samma sak som att bevara en fullständig historia?",opts:["Byggnader kan inte renoveras utan att historien försvinner.","Historien kräver även aktiva val om dokumentation och tolkning.","Alla besökare måste känna igen sig i byggnaden.","Museer bör bara visa muntliga berättelser."],ci:1,proof:"Det kräver också beslut om vilka erfarenheter som dokumenteras, hur de tolkas och vilka besökare som känner igen sig i berättelsen."}
+ ]}
+];
 
 /* provformat: [antal uppgifter, rekommenderad tid i minuter] */
 const FORMAT = {ORD:[10,3],LAS:[10,22],MEK:[10,8],ELF:[10,22],XYZ:[12,12],KVA:[10,10],NOG:[6,10],DTK:[12,23]};
@@ -784,7 +824,7 @@ function vIdag(){
     const st=tm(b.s),en=tm(b.e),cls=nowM>=en?"done":(nowM>=st&&nowM<en?"now":"");
     h+=`<li class="blk ${cls}"><div class="t">${b.s}–${b.e} <span class="muted small">${hm(b.m)}</span></div><div class="d">${esc(b.d)}</div><div class="chips">`;
     b.o.forEach(k=>{h+=`<button class="chip ${SUBJ[k].v?"v":"k"}" data-start="${k}" data-min="${b.m}" title="${SUBJ[k].n}">${SUBJ[k].l}</button>`});
-    h+=`</div>${guideHtml(b)}</li>`;
+    h+=`</div>${b.o.includes("LAS")?`<button class="btn sm pencil" data-reading-start style="margin:8px 0 2px">Välj en LÄS-text och starta</button>`:""}${guideHtml(b)}</li>`;
   });
   h+=`</ul>`;
   h+=`<h2>Logga tid i efterhand</h2><div class="row">
@@ -925,6 +965,7 @@ function drillHtml(){
     const hpTopicButtons=hpTopics.map(t=>{const n=HP_BANK.filter(q=>q.topic===t).length;return `<button class="btn sm ghost" data-hp-topic="${t}" style="flex:0 0 auto">${t} · ${n}</button>`}).join("");
     const btns=topicButtons(Object.keys(TOPICS).filter(t=>!focusTopics.includes(t)&&!examTypes.includes(t)));
     return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Frågor märkta med källa är riktiga uppgifter från dina prov, återgivna i originalets provlayout. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
+    <h3 style="margin-top:16px">LÄS – välj en text åt mig</h3><p class="small muted">Appen väljer en av tre övningstexter och ger fyra frågor. Svara först utan ledtrådar; efteråt får du facit med meningen som stödjer svaret.</p><button class="btn pencil" data-reading-start>Starta ett LÄS-pass</button>
     <h3 style="margin-top:16px">Öva på det du fastnade på</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(focusTopics)}</div>
     <h3 style="margin-top:16px">Provtyper – NOG och DTK</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(examTypes)}</div>
     <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">${HP_BANK.length.toLocaleString("sv-SE")} originalfrågor från de sökbara proven 2000–2026, sorterade efter matteområde och provdel (XYZ, KVA, NOG och DTK). Välj en kategori för att träna bara provfrågor. Frågor från äldre skannade PDF-filer är ännu inte importerade.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
@@ -936,15 +977,17 @@ function drillHtml(){
   if(drill.i<drill.qs.length){
     const q=drill.qs[drill.i];
     const opts=q.imageChoices?`<div class="answer-bubbles" aria-label="Välj svar">${q.opts.map((o,idx)=>`<button class="answer-bubble" data-opt="${idx}" aria-label="Svar ${o}">${o}</button>`).join("")}</div>`:q.opts.map((o,idx)=>`<button class="opt" data-opt="${idx}"><span class="ol">${L[idx]}</span><span class="ot">${o}</span></button>`).join("");
-    return `<div class="exam-progress">${drill.hpOnly?`Originalfrågor · ${esc(drill.hpTopic)} · `:drill.topic?`${esc(drill.topic)} · `:""}Fråga ${drill.i+1} av ${drill.qs.length}</div>
+    const passage=drill.passage?`<article class="reading-passage"><h3>${esc(drill.passage.title)}</h3>${drill.passage.text.split("\n\n").map((p,i)=>`<p><b>${i+1}.</b> ${esc(p)}</p>`).join("")}</article>`:"";
+    return `${drill.passage?`<div class="exam-progress">LÄS · ${esc(drill.passage.title)} · Fråga ${drill.i+1} av ${drill.qs.length}</div>`:`<div class="exam-progress">${drill.hpOnly?`Originalfrågor · ${esc(drill.hpTopic)} · `:drill.topic?`${esc(drill.topic)} · `:""}Fråga ${drill.i+1} av ${drill.qs.length}</div>`}${passage}
     <section class="flash exam-sheet" aria-label="Fråga ${drill.i+1}"><div class="exam-head ${q.imageChoices?"source-question":""}">${q.imageChoices?"":`<div class="exam-number">${drill.i+1}.</div>`}<div class="exam-prompt"><div class="drillq">${q.q}</div></div></div>
     ${q.imageChoices?opts:`<div class="opts">${opts}</div>`}
     <div class="exam-controls"><button class="btn sm ghost" id="drillQuit">Avbryt</button></div></section>`;
   }
   const sc=drill.res.filter(r=>r.ok).length,wr=drill.res.filter(r=>!r.ok),n=drill.qs.length;
-  const again=drill.hpOnly?`<button class="btn pencil" data-hp-topic="${drill.hpTopic}" style="flex:0 0 auto">Träna originalfrågorna igen</button>`:drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
-  return `<div class="flash"><div class="w">${sc}/${n}</div><div>på ${drill.sec} sekunder${drill.topic?` · ${drill.topic}`:""}</div>
-    ${wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.source||qLabel(r.q)}: <span class="wrong">${L[r.gi]}</span> → <span class="right">${r.imageChoices?L[r.ci]:`${L[r.ci]} ${r.opts[r.ci]}`}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
+  const again=drill.passage?`<button class="btn pencil" data-reading-start style="flex:0 0 auto">Välj en ny text</button>`:drill.hpOnly?`<button class="btn pencil" data-hp-topic="${drill.hpTopic}" style="flex:0 0 auto">Träna originalfrågorna igen</button>`:drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
+  return `<div class="flash"><div class="w">${sc}/${n}</div><div>${drill.passage?`LÄS · ${esc(drill.passage.title)}`:`på ${drill.sec} sekunder${drill.topic?` · ${drill.topic}`:""}`}</div>
+    ${drill.passage?`<div style="text-align:left;margin-top:16px">${drill.res.map((r,i)=>`<div class="reading-feedback"><b>${i+1}. ${r.ok?"Rätt":"Gå tillbaka till texten"} · ${L[r.ci]}: ${esc(r.opts[r.ci])}</b><div class="small" style="margin-top:5px">Textstöd: ”${esc(r.proof)}”</div></div>`).join("")}</div>`:""}
+    ${drill.passage?"":wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.source||qLabel(r.q)}: <span class="wrong">${L[r.gi]}</span> → <span class="right">${r.imageChoices?L[r.ci]:`${L[r.ci]} ${r.opts[r.ci]}`}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
     <div class="row" style="justify-content:center">${again}<button class="btn ghost" id="drillQuit" style="flex:0 0 auto">Klar</button></div></div>`;
 }
 function vMaterial(){
@@ -1011,7 +1054,8 @@ document.getElementById("tcancel").onclick=()=>{S.timer=null;save();render()};
 
 document.getElementById("app").addEventListener("click",e=>{
   const el=e.target.closest("button,input");if(!el)return;const ds=el.dataset;
-  if(ds.start){
+  if(ds.readingStart!==undefined){const set=pickr(LAS_PRACTICE);drill={qs:set.qs.map(q=>({q:q.q,opts:q.opts,ci:q.ci,proof:q.proof})),i:0,start:Date.now(),res:[],topic:"LÄS",passage:set};go("material")}
+  else if(ds.start){
     if(S.timer){toast("Spara eller avbryt pågående pass först");return}
     ensureAudio();S.timer={subj:ds.start,start:Date.now(),plan:+ds.min};save();render();toast("Timer startad");
   }
@@ -1047,7 +1091,7 @@ document.getElementById("app").addEventListener("click",e=>{
   else if(ds.hpTopic){const qs=HP_BANK.filter(q=>q.topic===ds.hpTopic).map(q=>hpOriginal(q.img,q.source,q.letter,q.opts));drill={qs,i:0,start:Date.now(),res:[],topic:ds.hpTopic,hpTopic:ds.hpTopic,hpOnly:true};render()}
   else if(ds.topic){const fs=ds.topic==="Vinklar – alla regler"?shuffled(TOPICS[ds.topic]):Array.from({length:10},()=>pickr(TOPICS[ds.topic]));drill={qs:fs.map(f=>mc(f())),i:0,start:Date.now(),res:[],topic:ds.topic};render()}
   else if(ds.opt!==undefined&&drill&&drill.i<drill.qs.length){const q=drill.qs[drill.i],gi=+ds.opt;
-    drill.res.push({q:q.q,opts:q.opts,ci:q.ci,gi,ok:gi===q.ci,source:q.source,imageChoices:q.imageChoices});drill.i++;
+    drill.res.push({q:q.q,opts:q.opts,ci:q.ci,gi,ok:gi===q.ci,source:q.source,imageChoices:q.imageChoices,proof:q.proof});drill.i++;
     if(drill.i>=drill.qs.length){drill.sec=Math.round((Date.now()-drill.start)/1000);const sc=drill.res.filter(r=>r.ok).length;
       S.drill.rounds++;if(!drill.topic){const b=S.drill.best;if(!b||sc>b.score||(sc===b.score&&drill.sec<b.sec))S.drill.best={score:sc,sec:drill.sec}}save()}
     render()}

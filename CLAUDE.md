@@ -71,7 +71,7 @@ Skriptet är uppdelat i block med kommentarer `/* ---------- namn ---------- */`
 - Bubbelraderna under Vecka ser ut som ett svarsformulär: varje ring är 30 minuter.
 - Svensk typografi i synlig text: ’ för apostrof och ” ” för citat. Raka citattecken bara i kod.
 - Escapa all användartext med `esc()` innan den hamnar i HTML.
-- Ingen provtext från riktiga högskoleprov får läggas in. Den är upphovsrättsskyddad. Länka till studera.nu i stället.
+- Användaren har uttryckligen uppgett att hen har tillstånd att använda provmaterialet i den lokala mappen `~/Hogskoleprov` för träning och har bett att det läggs in i appen. Sådant godkänt material får därför användas i träningsbanken. Behåll alltid provår, provtillfälle, provpass och uppgiftsnummer som källa; lägg inte till annat provmaterial utan motsvarande tillstånd.
 
 ## Idéer för vidare arbete
 

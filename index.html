@@ -126,6 +126,10 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .drillq .kva{display:flex;flex-direction:column;gap:12px;align-items:center;margin-bottom:10px}
 .drillq .kva>div{display:flex;align-items:center;gap:12px}
 .drillq .kva .kl{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 30px;border:2px solid currentColor;border-radius:50%;font-size:1rem;font-weight:700}
+.drillq .nog{display:flex;flex-direction:column;gap:7px;text-align:left;margin-bottom:8px}
+.drillq .nog .nq{font-weight:700}
+.drillq .nog .nr{display:flex;gap:8px;align-items:baseline}
+.drillq .nog .nr .kl{font-weight:700;flex:0 0 auto}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px auto 2px;max-width:440px}
 .opts.col{grid-template-columns:1fr;max-width:360px}
 .opt{display:flex;align-items:center;gap:10px;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--font-h);font-weight:800;cursor:pointer;text-align:left;color:var(--ink)}
@@ -141,6 +145,12 @@ label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
 .exam-prompt .drillq .rule{display:none}
 .exam-prompt .drillq .rt,.exam-prompt .drillq .frac{color:#202124;font-family:"Cambria Math","Times New Roman",serif}
 .exam-prompt .drillq .rt span,.exam-prompt .drillq .frac span{color:#202124}
+.exam-prompt .drillq .hp-qimg{display:block;width:min(100%,650px);height:auto;margin:4px auto 8px;background:#fff}
+.exam-prompt .drillq .hp-source{display:block;margin:4px 0 0;color:#697386;font:400 .8rem/1.4 var(--font-b);text-align:right}
+.exam-head.source-question{display:block}
+.exam-sheet .answer-bubbles{display:flex;justify-content:flex-start;gap:10px;margin:14px 0 14px 38px}
+.exam-sheet .answer-bubble{width:44px;height:44px;flex:0 0 44px;border:1.5px solid #b9bdc6;border-radius:50%;background:#fff;color:#202124;font:700 1rem var(--font-b);cursor:pointer}
+.exam-sheet .answer-bubble:hover{background:#f1f2f4;border-color:#202124}
 .exam-prompt .drillq svg{width:min(480px,100%);margin:12px 0 14px;padding:0;background:#fff;border-radius:0}
 .exam-prompt .drillq svg text{font-size:14px}
 .exam-sheet .opts{display:flex;flex-direction:column;gap:0;margin:12px 0 12px 38px;max-width:620px}
@@ -432,11 +442,28 @@ function mc(o){
   for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
   return {q:o.q,opts:arr.map(v=>comma(v)+unit),ci:arr.indexOf(a)};
 }
-const qLabel=q=>q.replace(/<svg[\s\S]*?<\/svg>/g,"[figur] ").replace(/<span class="rule">([\s\S]*?)<\/span>/g," $1").replace(/<br>/g," ").replace(/<span class="small muted">[\s\S]*?<\/span>/g,"").replace(/<span>[\s\S]*?<\/span>/g,"").trim();
+const qLabel=q=>q.replace(/<svg[\s\S]*?<\/svg>/g,"[figur] ").replace(/<img\b[^>]*>/g,"[provfråga] ").replace(/<span class="hp-source">([\s\S]*?)<\/span>/g," $1").replace(/<span class="rule">([\s\S]*?)<\/span>/g," $1").replace(/<br>/g," ").replace(/<span class="small muted">[\s\S]*?<\/span>/g,"").replace(/<span>[\s\S]*?<\/span>/g,"").trim();
 const KVAOPTS=["I är störst","II är störst","I och II är lika stora","Går inte att avgöra"];
 const kvaBody=(I,II,note)=>`<div class="kva"><div><span class="kl">I</span><span>${I}</span></div><div><span class="kl">II</span><span>${II}</span></div></div><span>${note||"jämför storhet I och II"}</span>`;
 const kva=(I,II,v1,v2)=>({q:kvaBody(I,II),opts:KVAOPTS.slice(),ci:v1>v2?0:v1<v2?1:2});
 const kvaD=(I,II,note)=>({q:kvaBody(I,II,note),opts:KVAOPTS.slice(),ci:3});
+const NOGOPTS=["(1) räcker, men inte (2)","(2) räcker, men inte (1)","(1) och (2) tillsammans räcker","(1) och (2) var för sig räcker","Mer information behövs"];
+const nogBody=(fraga,s1,s2)=>`<div class="nog"><div class="nq">${fraga}</div><div class="nr"><span class="kl">(1)</span><span>${s1}</span></div><div class="nr"><span class="kl">(2)</span><span>${s2}</span></div></div><span>Tillräcklig information för lösningen finns i …</span>`;
+const nog=(fraga,s1,s2,ci)=>({q:nogBody(fraga,s1,s2),opts:NOGOPTS.slice(),ci});
+function pick4(correct,pool){
+  const set=new Set([correct]);
+  for(const v of pool){if(set.size>=4)break;if(v!==correct&&v>0)set.add(v);}
+  let k=1;while(set.size<4){set.add(correct+10*k);set.add(correct-10*k>0?correct-10*k:correct+5*k);k++;}
+  const arr=[...set].slice(0,4);
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return {opts:arr.map(v=>String(v).replace(".",",")),ci:arr.indexOf(correct)};
+}
+function dtkBar(title,labels,vals){
+  const n=vals.length,maxV=Math.max(...vals),W=270,H=175,p=28,bw=(W-2*p)/n;
+  const bars=vals.map((v,i)=>{const h=(H-2*p-10)*(v/maxV),x=p+i*bw+bw*0.17,bwi=bw*0.66,y=H-p-h;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bwi.toFixed(1)}" height="${h.toFixed(1)}" fill="currentColor" rx="1"/><text x="${(x+bwi/2).toFixed(1)}" y="${H-p+14}" font-size="11" text-anchor="middle">${labels[i]}</text><text x="${(x+bwi/2).toFixed(1)}" y="${(y-4).toFixed(1)}" font-size="10" text-anchor="middle">${v}</text>`;}).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" class="fig"><text x="${p}" y="14" font-size="11">${title}</text><line x1="${p}" y1="${H-p}" x2="${W-p}" y2="${H-p}" stroke="currentColor" stroke-width="1.5"/>${bars}</svg>`;
+}
 const shuffled=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
 const angleSvg=(kind,a,b="x")=>{
   if(kind==="cross")return `<svg viewBox="0 0 180 120"><line x1="25" y1="100" x2="145" y2="20" stroke="currentColor" stroke-width="2"/><line x1="25" y1="20" x2="145" y2="100" stroke="currentColor" stroke-width="2"/><text x="88" y="38">${a}°</text><text x="82" y="96">${b}°</text></svg>`;
@@ -586,6 +613,9 @@ const TOPICS={
   ()=>{const side=pickr([6,8,10,12,14]);return{q:`En likbent rätvinklig triangel har kateterna ${side} cm. En cirkel tangerar båda kateterna och har centrum mitt på hypotenusan.<br><span class="small muted">Vad är cirkelns diameter?</span>`,a:side,unit:" cm"}}
  ]
 };
+const hpOriginal=(img,source,letter)=>{const key=`HP ${source}`;return{q:`<img class="hp-qimg" src="./provsfragor/${img}" alt="${key}, svarsalternativ i bilden"><span class="hp-source">${key}</span>`,opts:["A","B","C","D"],ci:["A","B","C","D"].indexOf(letter),imageChoices:true,source:key}};
+const HP_BANK=[["Geometri","2024-var-pass-2/xyz-01.png","2024 vår · XYZ, fråga 1","B"],["Algebra","2024-var-pass-2/xyz-02.png","2024 vår · XYZ, fråga 2","D"],["Algebra","2024-var-pass-2/xyz-03.png","2024 vår · XYZ, fråga 3","D"],["Procent","2024-var-pass-2/xyz-04.png","2024 vår · XYZ, fråga 4","B"],["Algebra","2024-var-pass-2/xyz-05.png","2024 vår · XYZ, fråga 5","A"],["Geometri","2024-var-pass-2/xyz-06.png","2024 vår · XYZ, fråga 6","B"],["Koordinater och avstånd","2024-var-pass-2/xyz-07.png","2024 vår · XYZ, fråga 7","C"],["Geometri","2024-var-pass-2/xyz-08.png","2024 vår · XYZ, fråga 8","D"],["Algebra","2024-var-pass-2/xyz-09.png","2024 vår · XYZ, fråga 9","A"],["Tal och delbarhet","2024-var-pass-2/xyz-10.png","2024 vår · XYZ, fråga 10","C"],["Statistik och sannolikhet","2024-var-pass-2/xyz-11.png","2024 vår · XYZ, fråga 11","D"],["Potenser","2024-var-pass-2/xyz-12.png","2024 vår · XYZ, fråga 12","B"],["Flöde och pumpar","2018-host/kvant-pass-4-kva-22.png","2018 höst · KVA, fråga 22","B"],["Rötter","2026-var/kvant-pass-3-xyz-12.png","2026 vår · XYZ, fråga 12","C"],["Geometri","2026-var/kvant-pass-3-xyz-11.png","2026 vår · XYZ, fråga 11","D"],["Bråk och decimaler","2026-host/kvant-pass-1-xyz-11.png","2026 höst · XYZ, fråga 11","B"]].map(([topic,img,source,letter])=>({topic,img,source,letter}));
+HP_BANK.forEach(x=>TOPICS[x.topic].push(()=>hpOriginal(x.img,x.source,x.letter)));
 let drill=null;
 function focusDrill(){const i=document.getElementById("drillIn");if(i)i.focus()}
 
@@ -849,27 +879,32 @@ function drillHtml(){
   const b=S.drill.best;
   if(!drill){
     const focusTopics=["Vinklar – alla regler","Koordinater och avstånd","Tal och delbarhet","Flöde och pumpar","Bråk – gemensam nämnare","Likbent triangel och cirkel"];
+    const examTypes=["Kvantitativa resonemang (NOG)","Diagram och tabeller (DTK)"];
     const topicButtons=topics=>topics.map(t=>`<button class="btn sm ghost" data-topic="${t}" style="flex:0 0 auto">${t}</button>`).join("");
-    const btns=topicButtons(Object.keys(TOPICS).filter(t=>!focusTopics.includes(t)));
-    return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
+    const hpTopics=[...new Set(HP_BANK.map(q=>q.topic))];
+    const hpTopicButtons=hpTopics.map(t=>{const n=HP_BANK.filter(q=>q.topic===t).length;return `<button class="btn sm ghost" data-hp-topic="${t}" style="flex:0 0 auto">${t} · ${n}</button>`}).join("");
+    const btns=topicButtons(Object.keys(TOPICS).filter(t=>!focusTopics.includes(t)&&!examTypes.includes(t)));
+    return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Frågor märkta med källa är riktiga uppgifter från dina prov, återgivna i originalets provlayout. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
     <h3 style="margin-top:16px">Öva på det du fastnade på</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(focusTopics)}</div>
+    <h3 style="margin-top:16px">Provtyper – NOG och DTK</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(examTypes)}</div>
+    <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">Välj ett ämne för att träna enbart originalfrågor. De visas som bilder från provhäftet med källa; välj A–D under bilden.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
     <h3 style="margin-top:16px">Övriga matteområden</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${btns}</div>
     <p class="small muted">${S.drill.rounds?`${S.drill.rounds} omgångar gjorda. Bästa blandade: ${b?`${b.score}/10 på ${b.sec} s`:"–"}.`:"Ingen omgång gjord än."}</p>
     <button class="btn pencil" id="drillStart">Starta 10 blandade</button>`;
   }
-  const L=["A","B","C","D"];
+  const L=["A","B","C","D","E"];
   if(drill.i<drill.qs.length){
     const q=drill.qs[drill.i];
-    const opts=q.opts.map((o,idx)=>`<button class="opt" data-opt="${idx}"><span class="ol">${L[idx]}</span><span class="ot">${o}</span></button>`).join("");
-    return `<div class="exam-progress">${drill.topic?`${esc(drill.topic)} · `:""}Fråga ${drill.i+1} av ${drill.qs.length}</div>
-    <section class="flash exam-sheet" aria-label="Fråga ${drill.i+1}"><div class="exam-head"><div class="exam-number">${drill.i+1}.</div><div class="exam-prompt"><div class="drillq">${q.q}</div></div></div>
-    <div class="opts">${opts}</div>
+    const opts=q.imageChoices?`<div class="answer-bubbles" aria-label="Välj svar">${q.opts.map((o,idx)=>`<button class="answer-bubble" data-opt="${idx}" aria-label="Svar ${o}">${o}</button>`).join("")}</div>`:q.opts.map((o,idx)=>`<button class="opt" data-opt="${idx}"><span class="ol">${L[idx]}</span><span class="ot">${o}</span></button>`).join("");
+    return `<div class="exam-progress">${drill.hpOnly?`Originalfrågor · ${esc(drill.hpTopic)} · `:drill.topic?`${esc(drill.topic)} · `:""}Fråga ${drill.i+1} av ${drill.qs.length}</div>
+    <section class="flash exam-sheet" aria-label="Fråga ${drill.i+1}"><div class="exam-head ${q.imageChoices?"source-question":""}">${q.imageChoices?"":`<div class="exam-number">${drill.i+1}.</div>`}<div class="exam-prompt"><div class="drillq">${q.q}</div></div></div>
+    ${q.imageChoices?opts:`<div class="opts">${opts}</div>`}
     <div class="exam-controls"><button class="btn sm ghost" id="drillQuit">Avbryt</button></div></section>`;
   }
   const sc=drill.res.filter(r=>r.ok).length,wr=drill.res.filter(r=>!r.ok),n=drill.qs.length;
-  const again=drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
+  const again=drill.hpOnly?`<button class="btn pencil" data-hp-topic="${drill.hpTopic}" style="flex:0 0 auto">Träna originalfrågorna igen</button>`:drill.topic?`<button class="btn pencil" data-topic="${drill.topic}" style="flex:0 0 auto">Ny omgång</button>`:`<button class="btn pencil" id="drillStart" style="flex:0 0 auto">Ny omgång</button>`;
   return `<div class="flash"><div class="w">${sc}/${n}</div><div>på ${drill.sec} sekunder${drill.topic?` · ${drill.topic}`:""}</div>
-    ${wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${qLabel(r.q)}: <span class="wrong">${L[r.gi]}</span> → <span class="right">${L[r.ci]} ${r.opts[r.ci]}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
+    ${wr.length?`<div style="text-align:left">${wr.map(r=>`<p class="small">${r.source||qLabel(r.q)}: <span class="wrong">${L[r.gi]}</span> → <span class="right">${r.imageChoices?L[r.ci]:`${L[r.ci]} ${r.opts[r.ci]}`}</span></p>`).join("")}</div>`:"<div class='right'>Alla rätt</div>"}
     <div class="row" style="justify-content:center">${again}<button class="btn ghost" id="drillQuit" style="flex:0 0 auto">Klar</button></div></div>`;
 }
 function vMaterial(){
@@ -968,9 +1003,10 @@ document.getElementById("app").addEventListener("click",e=>{
     STARTWORDS.forEach(([w,m])=>{if(!have.has(w.toLowerCase())){S.cards.push({id:uid(),w,m,box:0,due:today()});have.add(w.toLowerCase());n++}});
     S.pack=true;save();render();toast(n?n+" ord tillagda – "+(S.settings.perDay||20)+" nya per dag":"Alla ord finns redan")}
   else if(el.id==="drillStart"){const pool=Object.entries(TOPICS).filter(([k])=>!/KVA/.test(k)).flatMap(([,v])=>v);drill={qs:Array.from({length:10},()=>mc(pickr(pool)())),i:0,start:Date.now(),res:[]};render()}
+  else if(ds.hpTopic){const qs=HP_BANK.filter(q=>q.topic===ds.hpTopic).map(q=>hpOriginal(q.img,q.source,q.letter));drill={qs,i:0,start:Date.now(),res:[],topic:ds.hpTopic,hpTopic:ds.hpTopic,hpOnly:true};render()}
   else if(ds.topic){const fs=ds.topic==="Vinklar – alla regler"?shuffled(TOPICS[ds.topic]):Array.from({length:10},()=>pickr(TOPICS[ds.topic]));drill={qs:fs.map(f=>mc(f())),i:0,start:Date.now(),res:[],topic:ds.topic};render()}
   else if(ds.opt!==undefined&&drill&&drill.i<drill.qs.length){const q=drill.qs[drill.i],gi=+ds.opt;
-    drill.res.push({q:q.q,opts:q.opts,ci:q.ci,gi,ok:gi===q.ci});drill.i++;
+    drill.res.push({q:q.q,opts:q.opts,ci:q.ci,gi,ok:gi===q.ci,source:q.source,imageChoices:q.imageChoices});drill.i++;
     if(drill.i>=drill.qs.length){drill.sec=Math.round((Date.now()-drill.start)/1000);const sc=drill.res.filter(r=>r.ok).length;
       S.drill.rounds++;if(!drill.topic){const b=S.drill.best;if(!b||sc>b.score||(sc===b.score&&drill.sec<b.sec))S.drill.best={score:sc,sec:drill.sec}}save()}
     render()}

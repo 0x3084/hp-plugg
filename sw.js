@@ -1,6 +1,6 @@
 // Service worker: gör att appen fungerar offline efter första besöket.
-const CACHE = "hp-plugg-v7";
-const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
+const CACHE = "hp-plugg-v9";
+const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./provsfragor/2024-var-pass-2/xyz-01.png", "./provsfragor/2024-var-pass-2/xyz-02.png", "./provsfragor/2024-var-pass-2/xyz-03.png", "./provsfragor/2024-var-pass-2/xyz-04.png", "./provsfragor/2024-var-pass-2/xyz-05.png", "./provsfragor/2024-var-pass-2/xyz-06.png", "./provsfragor/2024-var-pass-2/xyz-07.png", "./provsfragor/2024-var-pass-2/xyz-08.png", "./provsfragor/2024-var-pass-2/xyz-09.png", "./provsfragor/2024-var-pass-2/xyz-10.png", "./provsfragor/2024-var-pass-2/xyz-11.png", "./provsfragor/2018-host/kvant-pass-4-kva-22.png", "./provsfragor/2026-var/kvant-pass-3-xyz-11.png", "./provsfragor/2026-var/kvant-pass-3-xyz-12.png", "./provsfragor/2026-host/kvant-pass-1-xyz-11.png", "./provsfragor/2024-var-pass-2/xyz-12.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));

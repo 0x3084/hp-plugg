@@ -242,6 +242,7 @@ details summary{cursor:pointer;font-family:var(--font-h);font-weight:700;padding
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="quant-bank.js"></script>
 <script>
 /* ---------- data ---------- */
 const SUBJ = {
@@ -623,7 +624,6 @@ const TOPICS={
 };
 const hpOriginal=(img,source,letter,labels=["A","B","C","D"])=>{const key=`HP ${source}`;return{q:`<img class="hp-qimg" src="./provsfragor/${img}" alt="${key}, svarsalternativ i bilden"><span class="hp-source">${key}</span>`,opts:labels,ci:labels.indexOf(letter),imageChoices:true,source:key}};
 const HP_BANK=[["Geometri","2024-var-pass-2/xyz-01.png","2024 vår · XYZ, fråga 1","B"],["Algebra","2024-var-pass-2/xyz-02.png","2024 vår · XYZ, fråga 2","D"],["Algebra","2024-var-pass-2/xyz-03.png","2024 vår · XYZ, fråga 3","D"],["Procent","2024-var-pass-2/xyz-04.png","2024 vår · XYZ, fråga 4","B"],["Algebra","2024-var-pass-2/xyz-05.png","2024 vår · XYZ, fråga 5","A"],["Geometri","2024-var-pass-2/xyz-06.png","2024 vår · XYZ, fråga 6","B"],["Koordinater och avstånd","2024-var-pass-2/xyz-07.png","2024 vår · XYZ, fråga 7","C"],["Geometri","2024-var-pass-2/xyz-08.png","2024 vår · XYZ, fråga 8","D"],["Algebra","2024-var-pass-2/xyz-09.png","2024 vår · XYZ, fråga 9","A"],["Tal och delbarhet","2024-var-pass-2/xyz-10.png","2024 vår · XYZ, fråga 10","C"],["Statistik och sannolikhet","2024-var-pass-2/xyz-11.png","2024 vår · XYZ, fråga 11","D"],["Potenser","2024-var-pass-2/xyz-12.png","2024 vår · XYZ, fråga 12","B"],["Flöde och pumpar","2018-host/kvant-pass-4-kva-22.png","2018 höst · KVA, fråga 22","B"],["Rötter","2026-var/kvant-pass-3-xyz-12.png","2026 vår · XYZ, fråga 12","C"],["Geometri","2026-var/kvant-pass-3-xyz-11.png","2026 vår · XYZ, fråga 11","D"],["Bråk och decimaler","2026-host/kvant-pass-1-xyz-11.png","2026 höst · XYZ, fråga 11","B"]].map(([topic,img,source,letter])=>({topic,img,source,letter}));
-HP_BANK.forEach(x=>TOPICS[x.topic].push(()=>hpOriginal(x.img,x.source,x.letter)));
 HP_BANK.push(
  {topic:"Kvantitativa resonemang (NOG)",img:"2000-var/2000vt-nog-01.png",source:"2000 vår · NOG, fråga 1",letter:"C",opts:["A","B","C","D","E"]},
  {topic:"Kvantitativa resonemang (NOG)",img:"2001-host/2001ht-nog-01.png",source:"2001 höst · NOG, fråga 1",letter:"C",opts:["A","B","C","D","E"]},
@@ -650,6 +650,11 @@ HP_BANK.push(
  {topic:"Bråk och decimaler",img:"2023-host/2023ht-xyz-01.png",source:"2023 höst · XYZ, fråga 1",letter:"C"},
  {topic:"Bråk och decimaler",img:"2025-host/2025ht-xyz-01.png",source:"2025 höst · XYZ, fråga 1",letter:"B"}
 );
+const importedQuant=window.HP_QUANT_BANK||[];
+const importedKeys=new Set(importedQuant.map(q=>q.source.replace(/, provpass \d+/,"")));
+for(let i=HP_BANK.length-1;i>=0;i--)if(importedKeys.has(HP_BANK[i].source))HP_BANK.splice(i,1);
+HP_BANK.push(...importedQuant);
+HP_BANK.forEach(x=>{if(TOPICS[x.topic])TOPICS[x.topic].push(()=>hpOriginal(x.img,x.source,x.letter,x.opts));});
 let drill=null;
 function focusDrill(){const i=document.getElementById("drillIn");if(i)i.focus()}
 
@@ -922,7 +927,7 @@ function drillHtml(){
     return `<p>Uppgifter i provets stil med svarsalternativ A–D. Välj ett område eller kör tio blandade. Frågor märkta med källa är riktiga uppgifter från dina prov, återgivna i originalets provlayout. Ett vinkelpass tränar en gång på varje vinkelregel.</p>
     <h3 style="margin-top:16px">Öva på det du fastnade på</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(focusTopics)}</div>
     <h3 style="margin-top:16px">Provtyper – NOG och DTK</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${topicButtons(examTypes)}</div>
-    <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">${HP_BANK.length} originalfrågor från 2000–2026, sorterade efter matteområde eller NOG. Välj en kategori för att träna bara provfrågor. De visas i provens originalformat med källa och facit.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
+    <h3 style="margin-top:16px">Riktiga uppgifter ur dina prov</h3><p class="small muted">${HP_BANK.length.toLocaleString("sv-SE")} originalfrågor från de sökbara proven 2000–2026, sorterade efter matteområde och provdel (XYZ, KVA, NOG och DTK). Välj en kategori för att träna bara provfrågor. Frågor från äldre skannade PDF-filer är ännu inte importerade.</p><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${hpTopicButtons}</div>
     <h3 style="margin-top:16px">Övriga matteområden</h3><div class="row" style="flex-wrap:wrap;gap:6px;margin:8px 0">${btns}</div>
     <p class="small muted">${S.drill.rounds?`${S.drill.rounds} omgångar gjorda. Bästa blandade: ${b?`${b.score}/10 på ${b.sec} s`:"–"}.`:"Ingen omgång gjord än."}</p>
     <button class="btn pencil" id="drillStart">Starta 10 blandade</button>`;

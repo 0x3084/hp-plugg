@@ -40,3 +40,13 @@ Datan finns bara i webbläsaren på enheten. Om du rensar Safaris data försvinn
 ## Bygga vidare med Claude Code
 
 Öppna mappen i Claude Code. `CLAUDE.md` förklarar hur appen är uppbyggd.
+
+## Importerade provfrågor
+
+`quant-bank.js` och bilderna i `provsfragor/quant-import/` innehåller importerade kvantitativa frågor med facit från de lokala sökbara PDF-proven. De grupperas efter matteområde och provdel i appen. Importen kan byggas om med macOS PDFKit:
+
+```bash
+swift scripts/import_quant_bank.swift /sökväg/till/Hogskoleprov .
+```
+
+Skannade prov utan textlager eller maskinläsbart facit tas inte med av importskriptet.

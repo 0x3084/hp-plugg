@@ -47,6 +47,7 @@ Datan finns bara i webbläsaren på enheten. Om du rensar Safaris data försvinn
 
 ```bash
 swift scripts/import_quant_bank.swift /sökväg/till/Hogskoleprov .
+swift scripts/classify_quant_bank_ocr.swift .
 ```
 
-Skannade prov utan textlager eller maskinläsbart facit tas inte med av importskriptet.
+OCR-steget läser bildfrågor för att märka ut rot- och bråkuppgifter som textutläsningen missar. Skannade prov utan maskinläsbart facit tas inte med av importskriptet.
